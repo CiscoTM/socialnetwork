@@ -5,7 +5,9 @@ import com.example.socialnetwork.domain.user.UserEmail;
 import com.example.socialnetwork.domain.user.UserId;
 import com.example.socialnetwork.domain.user.error.DuplicateEmailException;
 import com.example.socialnetwork.domain.user.ports.UserRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserRegistrationService {
 
     private final UserRepository userRepo;
@@ -29,5 +31,6 @@ public class UserRegistrationService {
         return user;
     }
 }
+
 
 
