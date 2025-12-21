@@ -7,10 +7,12 @@ import com.example.socialnetwork.domain.user.UserId;
 import com.example.socialnetwork.domain.user.error.DuplicateEmailException;
 import com.example.socialnetwork.domain.user.ports.UserRepository;
 
-import com.example.socialnetwork.testUtil.InMemoryUserRepository;
+import support.InMemoryUserRepository;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 
 public class UserRegistrationServiceTest {
 

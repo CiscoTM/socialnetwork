@@ -1,4 +1,4 @@
-package com.example.socialnetwork.testUtil;
+package support;
 
 import com.example.socialnetwork.domain.user.ports.UserRepository;
 import org.springframework.context.annotation.Bean;

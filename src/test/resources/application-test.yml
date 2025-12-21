@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/backend_social_network_test
+    username: admin
+    password: admin
+
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    url: jdbc:postgresql://localhost:5433/backend_social_network_test
+    user: admin
+    password: admin
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate.hbm2ddl.auto: none
+      jakarta.persistence.schema-generation.database.action: none

@@ -1,4 +1,4 @@
-package com.example.socialnetwork.testUtil;
+package support;
 
 import com.example.socialnetwork.domain.user.User;
 import com.example.socialnetwork.domain.user.UserEmail;

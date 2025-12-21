@@ -13,14 +13,24 @@ public class UserEntity {
     @Id
     private String id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "display_name")
     private String displayName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "created_at")
     private Instant createdAt;
+
+    public UserEntity() {
+    }
+
+    public UserEntity(String id, String email,String displayName, Instant createdAt) {
+        this.createdAt = createdAt;
+        this.displayName = displayName;
+        this.email = email;
+        this.id = id;
+    }
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
