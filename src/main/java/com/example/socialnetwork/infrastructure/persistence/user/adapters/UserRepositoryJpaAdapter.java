@@ -3,6 +3,7 @@ package com.example.socialnetwork.infrastructure.persistence.user.adapters;
 import com.example.socialnetwork.domain.user.User;
 import com.example.socialnetwork.domain.user.UserEmail;
 import com.example.socialnetwork.domain.user.UserId;
+import com.example.socialnetwork.domain.user.exceptions.UserAlreadyExistsException;
 import com.example.socialnetwork.domain.user.ports.UserRepository;
 import com.example.socialnetwork.infrastructure.persistence.user.UserEntity;
 import com.example.socialnetwork.infrastructure.persistence.user.jpa.JpaUserRepository;
@@ -20,7 +21,22 @@ public class UserRepositoryJpaAdapter implements UserRepository {
 
     @Override public Optional<User> findById(UserId id) { return jpa.findById(id.value()).map(this::toDomain); }
     @Override public Optional<User> findByEmail(UserEmail email) { return jpa.findByEmail(email.value()).map(this::toDomain);}
-    @Override public void save(User user) { jpa.save(toEntity(user)); }
+    @Override public void save(User user) {
+        try {
+            UserEntity entity = new UserEntity(
+                    user.id().value(),
+                    user.email().value(),
+                    user.displayName(),
+                    user.createdAt()
+            );
+            jpa.save(toEntity(user));
+        } catch (Exception ex) {
+            if (ex.getMessage().contains("users_email_key") || ex.getMessage().contains("unique")) {
+                throw new UserAlreadyExistsException(user.email().value());
+            }
+            throw ex;
+        }
+    }
     @Override public boolean existsByEmail(UserEmail email) { return jpa.existsByEmail(email.value()); }
 
     private User toDomain(UserEntity e) {

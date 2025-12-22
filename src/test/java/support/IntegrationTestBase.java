@@ -1,10 +1,14 @@
 package support;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles("test")
 public abstract class IntegrationTestBase {
-    @BeforeAll
-    static void beforeAll(){
-        PostgresTestContainer.getInstance().start();
+
+    private static final PostgresTestContainer POSTGRES = PostgresTestContainer.getInstance();
+
+    static {
+        POSTGRES.start(); // <-- se ejecuta antes de crear el ApplicationContext
     }
 }
+

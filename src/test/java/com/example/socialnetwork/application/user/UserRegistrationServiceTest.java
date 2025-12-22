@@ -4,17 +4,19 @@ import com.example.socialnetwork.application.user.service.UserRegistrationServic
 import com.example.socialnetwork.domain.user.User;
 import com.example.socialnetwork.domain.user.UserEmail;
 import com.example.socialnetwork.domain.user.UserId;
-import com.example.socialnetwork.domain.user.error.DuplicateEmailException;
+import com.example.socialnetwork.domain.user.exceptions.InvalidEmailException;
+import com.example.socialnetwork.domain.user.exceptions.UserAlreadyExistsException;
 import com.example.socialnetwork.domain.user.ports.UserRepository;
 
 import support.InMemoryUserRepository;
 import org.junit.jupiter.api.Test;
+import support.IntegrationTestBase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
-public class UserRegistrationServiceTest {
+public class UserRegistrationServiceTest extends IntegrationTestBase {
 
     private UserRegistrationService createService(UserRepository userRepo) {
         return new UserRegistrationService(userRepo);
@@ -55,8 +57,8 @@ public class UserRegistrationServiceTest {
         assertThatThrownBy(() ->
                 service.register(id2.value(), email.value(), "Fran")
         )
-                .isInstanceOf(DuplicateEmailException.class)
-                .hasMessageContaining(DuplicateEmailException.MESSAGE);
+                .isInstanceOf(UserAlreadyExistsException.class)
+                .hasMessageContaining(String.format(UserAlreadyExistsException.MESSAGE, email.value()));
     }
 }
 

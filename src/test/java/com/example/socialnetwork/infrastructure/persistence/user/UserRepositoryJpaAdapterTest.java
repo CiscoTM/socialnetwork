@@ -41,7 +41,6 @@ class UserRepositoryJpaAdapterTest {
         assertThat(loaded).isNotNull();
         assertThat(loaded.email().value()).isEqualTo("test@example.com");
     }
-
     @Test
     void exists_by_email() {
         User user = new User(

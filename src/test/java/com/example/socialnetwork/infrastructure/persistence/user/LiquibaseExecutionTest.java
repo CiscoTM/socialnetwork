@@ -6,13 +6,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.beans.factory.annotation.Autowired;
+import support.IntegrationTestBase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class LiquibaseExecutionTest {
-
+class LiquibaseExecutionTest extends IntegrationTestBase {
     @Autowired
     JdbcTemplate jdbc;
 
@@ -22,7 +22,6 @@ class LiquibaseExecutionTest {
                 "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'users'",
                 Integer.class
         );
-
         assertThat(count).isEqualTo(1);
     }
 }
