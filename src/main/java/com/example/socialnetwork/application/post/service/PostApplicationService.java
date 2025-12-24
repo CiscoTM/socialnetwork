@@ -5,7 +5,9 @@ import com.example.socialnetwork.application.post.exception.PostNotFoundExceptio
 import com.example.socialnetwork.domain.post.Post;
 import com.example.socialnetwork.domain.post.PostId;
 import com.example.socialnetwork.domain.post.ports.PostRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class PostApplicationService {
     private final PostRepository repository;
 

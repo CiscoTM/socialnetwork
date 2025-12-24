@@ -23,7 +23,7 @@ public class CreatePostTest {
 
         CreatePostResponse response = service.createPost(command);
 
-        assertNotNull(response.PostId());
+        assertNotNull(response.postId());
         assertEquals(command.authorId(), response.authorId());
         assertEquals(command.content(), response.content());
 
