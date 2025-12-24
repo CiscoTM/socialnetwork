@@ -23,12 +23,6 @@ public class UserRepositoryJpaAdapter implements UserRepository {
     @Override public Optional<User> findByEmail(UserEmail email) { return jpa.findByEmail(email.value()).map(this::toDomain);}
     @Override public void save(User user) {
         try {
-            UserEntity entity = new UserEntity(
-                    user.id().value(),
-                    user.email().value(),
-                    user.displayName(),
-                    user.createdAt()
-            );
             jpa.save(toEntity(user));
         } catch (Exception ex) {
             if (ex.getMessage().contains("users_email_key") || ex.getMessage().contains("unique")) {

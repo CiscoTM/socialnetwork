@@ -1,5 +1,6 @@
 package com.example.socialnetwork.delivery.user.controllers;
 
+import com.example.socialnetwork.domain.post.ports.PostRepository;
 import com.example.socialnetwork.domain.user.ports.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import support.IntegrationTestBase;
 
