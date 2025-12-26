@@ -1,7 +1,6 @@
 package com.example.socialnetwork.domain.post;
 
 import com.example.socialnetwork.domain.post.exception.InvalidAuthorIdException;
-import com.example.socialnetwork.domain.post.exception.NullAuthorIdException;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
