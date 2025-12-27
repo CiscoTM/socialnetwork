@@ -4,7 +4,6 @@ import com.example.socialnetwork.application.user.service.UserRegistrationServic
 import com.example.socialnetwork.domain.user.User;
 import com.example.socialnetwork.domain.user.UserEmail;
 import com.example.socialnetwork.domain.user.UserId;
-import com.example.socialnetwork.domain.user.exceptions.InvalidEmailException;
 import com.example.socialnetwork.domain.user.exceptions.UserAlreadyExistsException;
 import com.example.socialnetwork.domain.user.ports.UserRepository;
 
