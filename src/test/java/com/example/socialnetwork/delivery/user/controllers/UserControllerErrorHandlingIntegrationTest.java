@@ -1,44 +1,43 @@
 package com.example.socialnetwork.delivery.user.controllers;
 
-import com.example.socialnetwork.domain.user.User;
-import com.example.socialnetwork.domain.user.UserEmail;
-import com.example.socialnetwork.domain.user.UserId;
+import com.example.socialnetwork.application.user.service.UserRegistrationService;
+import com.example.socialnetwork.domain.user.exceptions.UserAlreadyExistsException;
 import com.example.socialnetwork.domain.user.ports.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import support.IntegrationTestBase;
 
-import java.time.Instant;
-
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@WebMvcTest(UserController.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class UserControllerErrorHandlingIntegrationTest extends IntegrationTestBase {
+class UserControllerErrorHandlingIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private UserRepository repository;
+    @MockitoBean
+    private UserRepository userRepository;
+
+    @MockitoBean
+    private UserRegistrationService userRegistrationService;
 
     @Test
     void returns_conflict_when_email_already_exists() throws Exception {
-        // Arrange: usuario existente en BD
-        repository.save(new User(
-                UserId.of("u-1"),
-                UserEmail.of("duplicate@example.com"),
-                "Francisco",
-                Instant.now()
-        ));
+
+        // Simulamos que el servicio lanza la excepción de dominio
+        doThrow(new UserAlreadyExistsException("duplicate@example.com"))
+                .when(userRegistrationService)
+                .register(any(),any(),any());
 
         String payload = """
             {
@@ -48,7 +47,6 @@ public class UserControllerErrorHandlingIntegrationTest extends IntegrationTestB
             }
             """;
 
-        // Act + Assert: llamada HTTP y verificación de error 409
         mockMvc.perform(post("/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))

@@ -8,11 +8,12 @@ import com.example.socialnetwork.domain.post.ports.PostRepository;
 import com.example.socialnetwork.infrastructure.persistence.post.PostEntity;
 import com.example.socialnetwork.infrastructure.persistence.post.jpa.JpaPostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
+@Component
 public class PostRepositoryJpaAdapter implements PostRepository {
 
     private final JpaPostRepository jpa;

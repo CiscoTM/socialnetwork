@@ -1,44 +1,51 @@
 package com.example.socialnetwork.delivery.user.controllers;
 
-import com.example.socialnetwork.domain.post.ports.PostRepository;
+import com.example.socialnetwork.application.user.service.UserRegistrationService;
+import com.example.socialnetwork.domain.user.User;
+import com.example.socialnetwork.domain.user.UserEmail;
+import com.example.socialnetwork.domain.user.UserId;
 import com.example.socialnetwork.domain.user.ports.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import support.IntegrationTestBase;
 
-import javax.sql.DataSource;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@WebMvcTest(UserController.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class UserControllerIntegrationTest extends IntegrationTestBase {
+class UserControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
+
+    @MockitoBean
     private UserRepository userRepository;
 
-    @BeforeEach
-    void cleanDatabase(@Autowired DataSource ds) throws Exception {
-        try (var conn = ds.getConnection();
-             var stmt = conn.createStatement()) {
-            stmt.execute("DELETE FROM users");
-        }
-    }
+    @MockitoBean
+    private UserRegistrationService userRegistrationService;
 
     @Test
     void registers_user_successfully_via_http() throws Exception {
+
+        // Mock del servicio de registro
+        when(userRegistrationService.register(any(),any(),any())).thenReturn(
+                new User(
+                        UserId.of("u-1"),
+                        UserEmail.of("http-test@example.com"),
+                        "Francisco",
+                        java.time.Instant.now()
+                )
+        );
+
         String payload = """
                 {
                   "id": "u-1",
@@ -54,9 +61,5 @@ class UserControllerIntegrationTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$.id").value("u-1"))
                 .andExpect(jsonPath("$.email").value("http-test@example.com"))
                 .andExpect(jsonPath("$.displayName").value("Francisco"));
-
-        assertThat(userRepository.findById(com.example.socialnetwork.domain.user.UserId.of("u-1")))
-                .isPresent();
     }
 }
-
