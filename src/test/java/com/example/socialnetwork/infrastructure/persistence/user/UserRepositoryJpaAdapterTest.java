@@ -1,6 +1,5 @@
 package com.example.socialnetwork.infrastructure.persistence.user;
 
-import com.example.socialnetwork.SocialnetworkApplication;
 import com.example.socialnetwork.domain.user.User;
 import com.example.socialnetwork.domain.user.UserEmail;
 import com.example.socialnetwork.domain.user.UserId;
@@ -9,22 +8,20 @@ import com.example.socialnetwork.infrastructure.persistence.user.adapters.UserRe
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import support.IntegrationTestBase;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import support.JpaTestBase;
 
 import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Testcontainers
 @ActiveProfiles("test")
 @Import(UserRepositoryJpaAdapter.class)
-class UserRepositoryJpaAdapterTest extends IntegrationTestBase {
+class UserRepositoryJpaAdapterTest extends JpaTestBase {
 
     @Autowired
     private UserRepository repository;
@@ -45,11 +42,12 @@ class UserRepositoryJpaAdapterTest extends IntegrationTestBase {
         assertThat(loaded).isNotNull();
         assertThat(loaded.email().value()).isEqualTo("test@example.com");
     }
+
     @Test
     void exists_by_email() {
         User user = new User(
                 new UserId("u2"),
-                UserEmail.of("unique@example.com")                ,
+                UserEmail.of("unique@example.com"),
                 "Another User",
                 Instant.now()
         );

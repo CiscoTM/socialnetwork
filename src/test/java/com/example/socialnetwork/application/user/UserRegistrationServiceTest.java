@@ -6,16 +6,41 @@ import com.example.socialnetwork.domain.user.UserEmail;
 import com.example.socialnetwork.domain.user.UserId;
 import com.example.socialnetwork.domain.user.exceptions.UserAlreadyExistsException;
 import com.example.socialnetwork.domain.user.ports.UserRepository;
-
-import support.InMemoryUserRepository;
 import org.junit.jupiter.api.Test;
-import support.IntegrationTestBase;
+
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+public class UserRegistrationServiceTest {
 
-public class UserRegistrationServiceTest extends IntegrationTestBase {
+    private static class InMemoryUserRepository implements UserRepository {
+
+        private final Map<String, User> store = new HashMap<>();
+
+        @Override
+        public Optional<User> findById(UserId id) {
+            return Optional.ofNullable(store.get(id.value()));
+        }
+
+        @Override
+        public Optional<User> findByEmail(UserEmail email) {
+            return store.values().stream()
+                    .filter(u -> u.email().equals(email))
+                    .findFirst();
+        }
+
+        @Override
+        public void save(User user) {
+            store.put(user.id().value(), user);
+        }
+
+        @Override
+        public boolean existsByEmail(UserEmail email) {
+            return findByEmail(email).isPresent();
+        }
+    }
 
     private UserRegistrationService createService(UserRepository userRepo) {
         return new UserRegistrationService(userRepo);
@@ -60,4 +85,3 @@ public class UserRegistrationServiceTest extends IntegrationTestBase {
                 .hasMessageContaining(String.format(UserAlreadyExistsException.MESSAGE, email.value()));
     }
 }
-
