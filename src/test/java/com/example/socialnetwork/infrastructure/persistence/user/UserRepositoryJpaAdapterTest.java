@@ -28,6 +28,7 @@ class UserRepositoryJpaAdapterTest extends JpaTestBase {
 
     @Test
     void save_and_find_user() {
+        // Arrange
         User user = new User(
                 new UserId("u1"),
                 UserEmail.of("test@example.com"),
@@ -35,8 +36,10 @@ class UserRepositoryJpaAdapterTest extends JpaTestBase {
                 Instant.now()
         );
 
+        // Act
         repository.save(user);
 
+        // Assert
         User loaded = repository.findById(UserId.of("u1")).orElseThrow();
 
         assertThat(loaded).isNotNull();
@@ -45,6 +48,7 @@ class UserRepositoryJpaAdapterTest extends JpaTestBase {
 
     @Test
     void exists_by_email() {
+        // Arrange
         User user = new User(
                 new UserId("u2"),
                 UserEmail.of("unique@example.com"),
@@ -54,6 +58,7 @@ class UserRepositoryJpaAdapterTest extends JpaTestBase {
 
         repository.save(user);
 
+        // Assert
         assertThat(repository.existsByEmail(UserEmail.of("unique@example.com"))).isTrue();
         assertThat(repository.existsByEmail(UserEmail.of("other@example.com"))).isFalse();
     }

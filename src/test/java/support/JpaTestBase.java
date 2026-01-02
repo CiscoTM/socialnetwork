@@ -3,7 +3,6 @@ package support;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-
 public abstract class JpaTestBase {
 
     private static final PostgresTestContainer POSTGRES = PostgresTestContainer.getInstance();
@@ -25,3 +24,5 @@ public abstract class JpaTestBase {
         registry.add("spring.liquibase.password", POSTGRES::getPassword);
     }
 }
+
+

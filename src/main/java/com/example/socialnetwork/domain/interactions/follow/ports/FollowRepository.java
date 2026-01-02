@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface FollowRepository {
     void save(Follow follow);
-    Optional<Follow>findByUsers(AuthorId followerId, AuthorId followedId);
+    Optional<Follow>findByFollowerAndFollowed(AuthorId followerId, AuthorId followedId);
 }
