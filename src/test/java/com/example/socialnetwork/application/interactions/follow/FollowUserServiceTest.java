@@ -40,7 +40,7 @@ public class FollowUserServiceTest {
         AuthorId follower = AuthorId.of(UUID.randomUUID());
         AuthorId followed = AuthorId.of(UUID.randomUUID());
 
-        when(repository.findByUsers(follower,followed))
+        when(repository.findByFollowerAndFollowed(follower,followed))
                 .thenReturn(Optional.of(mock(Follow.class)));
         assertThatThrownBy(() -> service.execute(follower, followed))
                 .isInstanceOf(DuplicateFollowException.class);

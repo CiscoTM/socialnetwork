@@ -20,7 +20,7 @@ public class FollowUserService {
         if(follower.value().equals(followed.value())){
             throw new SelfFollowNotAllowedException("A user cannot follow themselves");
         }
-        followRepository.findByUsers(follower, followed)
+        followRepository.findByFollowerAndFollowed(follower, followed)
                 .ifPresent( existing -> {
                     throw new DuplicateFollowException("User already follows this user");
         });
