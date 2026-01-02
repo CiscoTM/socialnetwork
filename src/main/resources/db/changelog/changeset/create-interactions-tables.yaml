@@ -1,0 +1,160 @@
+databaseChangeLog:
+
+  # COMMENTS
+  - changeSet:
+      id: create-comments-table
+      author: francisco
+      changes:
+        - createTable:
+            tableName: comments
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: post_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: author_id
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: content
+                  type: text
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: comments
+            baseColumnNames: post_id
+            referencedTableName: posts
+            referencedColumnNames: id
+            constraintName: fk_comments_posts
+
+        - addForeignKeyConstraint:
+            baseTableName: comments
+            baseColumnNames: author_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_comments_users
+
+
+  # LIKES
+  - changeSet:
+      id: create-likes-table
+      author: francisco
+      changes:
+        - createTable:
+            tableName: likes
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: post_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: user_id
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: likes
+            columnNames: post_id, user_id
+            constraintName: uk_likes_post_user
+
+        - addForeignKeyConstraint:
+            baseTableName: likes
+            baseColumnNames: post_id
+            referencedTableName: posts
+            referencedColumnNames: id
+            constraintName: fk_likes_posts
+
+        - addForeignKeyConstraint:
+            baseTableName: likes
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_likes_users
+
+
+  # FOLLOWS
+  - changeSet:
+      id: create-follows-table
+      author: francisco
+      changes:
+        - createTable:
+            tableName: follows
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: follower_id
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: followed_id
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: follows
+            columnNames: follower_id, followed_id
+            constraintName: uk_follows_pair
+
+        - addForeignKeyConstraint:
+            baseTableName: follows
+            baseColumnNames: follower_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_follows_follower
+
+        - addForeignKeyConstraint:
+            baseTableName: follows
+            baseColumnNames: followed_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_follows_followed

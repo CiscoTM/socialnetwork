@@ -22,20 +22,7 @@ public class PostgresTestContainer extends PostgreSQLContainer<PostgresTestConta
     }
 
     @Override
-    public void start() {
-        super.start();
-
-        System.setProperty("spring.datasource.url", container.getJdbcUrl());
-        System.setProperty("spring.datasource.username", container.getUsername());
-        System.setProperty("spring.datasource.password", container.getPassword());
-        System.setProperty("spring.liquibase.url", container.getJdbcUrl());
-        System.setProperty("spring.liquibase.user", container.getUsername());
-        System.setProperty("spring.liquibase.password", container.getPassword());
-
-    }
-
-    @Override
     public void stop() {
-        // No-op: Testcontainers gestiona la limpieza
+        // Testcontainers gestiona la limpieza
     }
 }
