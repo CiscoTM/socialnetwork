@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Component
+@Repository
 public class PostRepositoryJpaAdapter implements PostRepository {
 
     private final JpaPostRepository jpa;
