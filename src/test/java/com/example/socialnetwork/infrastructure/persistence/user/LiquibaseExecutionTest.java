@@ -2,26 +2,32 @@ package com.example.socialnetwork.infrastructure.persistence.user;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.boot.jdbc.autoconfigure.JdbcTemplateAutoConfiguration;
-import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.liquibase.autoconfigure.LiquibaseAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import support.IntegrationTestBase;
-import support.JpaTestBase;
 
 import static org.assertj.core.api.Assertions.assertThat;
-@DataJpaTest
-@Testcontainers
+
+@SpringBootTest
 @ActiveProfiles("test")
-class LiquibaseExecutionTest extends JpaTestBase {
+class LiquibaseExecutionTest extends IntegrationTestBase {
+
+    @Configuration
+    @ImportAutoConfiguration({
+            DataSourceAutoConfiguration.class,
+            JdbcTemplateAutoConfiguration.class,
+            LiquibaseAutoConfiguration.class
+    })
+    static class MinimalConfig {
+        // No escanea tu aplicación
+        // Solo activa la autoconfiguración necesaria
+    }
 
     @Autowired
     JdbcTemplate jdbc;

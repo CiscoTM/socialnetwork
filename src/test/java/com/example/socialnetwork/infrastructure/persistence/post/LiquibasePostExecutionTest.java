@@ -2,18 +2,32 @@ package com.example.socialnetwork.infrastructure.persistence.post;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.JdbcTemplateAutoConfiguration;
+import org.springframework.boot.liquibase.autoconfigure.LiquibaseAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import support.JpaTestBase;
+import support.IntegrationTestBase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-@Testcontainers
+@SpringBootTest
 @ActiveProfiles("test")
-class LiquibasePostExecutionTest extends JpaTestBase {
+class LiquibasePostExecutionTest extends IntegrationTestBase {
+
+    @Configuration
+    @ImportAutoConfiguration({
+            DataSourceAutoConfiguration.class,
+            JdbcTemplateAutoConfiguration.class,
+            LiquibaseAutoConfiguration.class
+    })
+    static class MinimalConfig {
+        // No escanea tu aplicación
+        // Solo activa la autoconfiguración necesaria
+    }
 
     @Autowired
     JdbcTemplate jdbc;
@@ -24,9 +38,6 @@ class LiquibasePostExecutionTest extends JpaTestBase {
                 "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'posts'",
                 Integer.class
         );
-
-        assertThat(count)
-                .as("Liquibase should have created 'posts' table")
-                .isEqualTo(1);
+        assertThat(count).isEqualTo(1);
     }
 }

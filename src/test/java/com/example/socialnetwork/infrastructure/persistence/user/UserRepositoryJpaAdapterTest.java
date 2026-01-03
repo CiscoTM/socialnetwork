@@ -7,7 +7,6 @@ import com.example.socialnetwork.domain.user.ports.UserRepository;
 import com.example.socialnetwork.infrastructure.persistence.user.adapters.UserRepositoryJpaAdapter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -16,6 +15,7 @@ import support.JpaTestBase;
 import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
 @DataJpaTest
 @Testcontainers
