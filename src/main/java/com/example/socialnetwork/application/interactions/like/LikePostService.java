@@ -6,7 +6,9 @@ import com.example.socialnetwork.domain.interactions.like.exceptions.DuplicateLi
 import com.example.socialnetwork.domain.interactions.like.ports.LikeRepository;
 import com.example.socialnetwork.domain.post.AuthorId;
 import com.example.socialnetwork.domain.post.PostId;
+import org.springframework.stereotype.Service;
 
+@Service
 public class LikePostService {
     private final LikeRepository likeRepository;
 

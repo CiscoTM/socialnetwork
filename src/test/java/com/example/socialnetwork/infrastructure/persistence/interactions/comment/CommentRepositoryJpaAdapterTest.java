@@ -13,11 +13,15 @@ import com.example.socialnetwork.infrastructure.persistence.user.UserEntity;
 import com.example.socialnetwork.infrastructure.persistence.user.jpa.JpaUserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import support.JpaTestBase;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -27,8 +31,26 @@ import static org.assertj.core.api.Assertions.*;
 @DataJpaTest
 @Testcontainers
 @ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(CommentRepositoryJpaAdapter.class)
-class CommentRepositoryJpaAdapterTest extends JpaTestBase {
+class CommentRepositoryJpaAdapterTest {
+
+    @Container
+    static PostgreSQLContainer<?> postgres =
+            new PostgreSQLContainer<>("postgres:15-alpine");
+
+    @DynamicPropertySource
+    static void configure(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.datasource.driver-class-name", postgres::getDriverClassName);
+
+        registry.add("spring.liquibase.enabled", () -> true);
+        registry.add("spring.liquibase.url", postgres::getJdbcUrl);
+        registry.add("spring.liquibase.user", postgres::getUsername);
+        registry.add("spring.liquibase.password", postgres::getPassword);
+    }
 
     @Autowired private CommentRepositoryJpaAdapter repository;
     @Autowired private JpaCommentRepository jpaRepository;
@@ -48,7 +70,7 @@ class CommentRepositoryJpaAdapterTest extends JpaTestBase {
         ));
 
         userRepository.save(new UserEntity(
-                authorIdValue.toString(),
+                authorIdValue,
                 "user@test.com",
                 "User Name",
                 Instant.now()

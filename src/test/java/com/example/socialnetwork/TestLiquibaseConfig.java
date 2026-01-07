@@ -1,6 +1,6 @@
 package com.example.socialnetwork;
 
-import org.springframework.boot.liquibase.autoconfigure.LiquibaseProperties;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;

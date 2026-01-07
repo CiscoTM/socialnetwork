@@ -17,7 +17,7 @@ public class UserRegistrationService {
     }
 
     public User register(String id, String email, String displayName) {
-        UserId userId = UserId.of(id);
+        UserId userId = UserId.fromString(id);
         UserEmail userEmail = UserEmail.of(email);
 
         if (userRepo.existsByEmail(userEmail)) {

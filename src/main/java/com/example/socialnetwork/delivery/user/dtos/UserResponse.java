@@ -13,7 +13,7 @@ public record UserResponse(
 
     public static UserResponse fromDomain(User user) {
         return new UserResponse(
-                user.id().value(),
+                user.id().value().toString(),
                 user.email().value(),
                 user.displayName(),
                 user.createdAt()

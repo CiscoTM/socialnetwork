@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
+
 @RestController
 @RequestMapping("/api/comments")
 public class CommentController {
@@ -29,7 +31,8 @@ public class CommentController {
                 PostId.of(request.postId()),
                 request.content()
         );
-        return ResponseEntity.ok(CommentMapper.toResponse(comment));
+//        return ResponseEntity.ok(CommentMapper.toResponse(comment));
+        return ResponseEntity .created(URI.create("/api/comments/" + comment.id().value())) .body(CommentMapper.toResponse(comment));
     }
 
 }

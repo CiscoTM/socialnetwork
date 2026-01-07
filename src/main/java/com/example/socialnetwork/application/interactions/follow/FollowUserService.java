@@ -6,9 +6,11 @@ import com.example.socialnetwork.domain.interactions.follow.exceptions.Duplicate
 import com.example.socialnetwork.domain.interactions.follow.exceptions.SelfFollowNotAllowedException;
 import com.example.socialnetwork.domain.interactions.follow.ports.FollowRepository;
 import com.example.socialnetwork.domain.post.AuthorId;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+@Service
 public class FollowUserService {
     private final FollowRepository followRepository;
 
