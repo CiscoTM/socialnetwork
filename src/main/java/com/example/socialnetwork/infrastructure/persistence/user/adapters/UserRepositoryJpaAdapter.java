@@ -13,15 +13,25 @@ import java.util.Optional;
 
 @Repository
 public class UserRepositoryJpaAdapter implements UserRepository {
+
     private final JpaUserRepository jpa;
 
     public UserRepositoryJpaAdapter(JpaUserRepository jpa) {
         this.jpa = jpa;
     }
 
-    @Override public Optional<User> findById(UserId id) { return jpa.findById(id.value()).map(this::toDomain); }
-    @Override public Optional<User> findByEmail(UserEmail email) { return jpa.findByEmail(email.value()).map(this::toDomain);}
-    @Override public void save(User user) {
+    @Override
+    public Optional<User> findById(UserId id) {
+        return jpa.findById(id.value()).map(this::toDomain);
+    }
+
+    @Override
+    public Optional<User> findByEmail(UserEmail email) {
+        return jpa.findByEmail(email.value()).map(this::toDomain);
+    }
+
+    @Override
+    public void save(User user) {
         try {
             jpa.save(toEntity(user));
         } catch (Exception ex) {
@@ -31,7 +41,11 @@ public class UserRepositoryJpaAdapter implements UserRepository {
             throw ex;
         }
     }
-    @Override public boolean existsByEmail(UserEmail email) { return jpa.existsByEmail(email.value()); }
+
+    @Override
+    public boolean existsByEmail(UserEmail email) {
+        return jpa.existsByEmail(email.value());
+    }
 
     private User toDomain(UserEntity e) {
         return User.restore(
@@ -41,6 +55,7 @@ public class UserRepositoryJpaAdapter implements UserRepository {
                 e.getCreatedAt()
         );
     }
+
     private UserEntity toEntity(User u) {
         return new UserEntity(
                 u.id().value(),

@@ -6,7 +6,9 @@ import com.example.socialnetwork.domain.interactions.comment.CommentId;
 import com.example.socialnetwork.domain.interactions.comment.ports.CommentRepository;
 import com.example.socialnetwork.domain.post.AuthorId;
 import com.example.socialnetwork.domain.post.PostId;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CreateCommentService {
     private final CommentRepository commentRepository;
 

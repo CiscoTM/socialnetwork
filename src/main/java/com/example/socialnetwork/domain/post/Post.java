@@ -27,7 +27,8 @@ public record Post(
     public static Post create(AuthorId authorId, PostContent content) {
         return new Post(
                 PostId.generate(),
-                authorId,
+                AuthorId.of(authorId.value())
+                ,
                 content,
                 Instant.now()
         );

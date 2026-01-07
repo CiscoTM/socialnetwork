@@ -1,10 +1,6 @@
 package com.example.socialnetwork.infrastructure.persistence.interactions.comment;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
+import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -13,7 +9,6 @@ import java.util.UUID;
 public class CommentEntity {
 
     @Id
-    @Column(nullable = false)
     private UUID id;
 
     @Column(name = "post_id", nullable = false)
@@ -22,7 +17,7 @@ public class CommentEntity {
     @Column(name = "author_id", nullable = false)
     private UUID authorId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "text")
     private String content;
 
     @Column(name = "created_at", nullable = false)
@@ -38,7 +33,6 @@ public class CommentEntity {
         this.createdAt = createdAt;
     }
 
-    // GETTERS
     public UUID getId() { return id; }
     public UUID getPostId() { return postId; }
     public UUID getAuthorId() { return authorId; }

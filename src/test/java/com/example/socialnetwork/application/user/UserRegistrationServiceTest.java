@@ -19,10 +19,7 @@ public class UserRegistrationServiceTest {
 
         private final Map<String, User> store = new HashMap<>();
 
-        @Override
-        public Optional<User> findById(UserId id) {
-            return Optional.ofNullable(store.get(id.value()));
-        }
+        @Override public Optional<User> findById(UserId id) { return Optional.ofNullable(store.get(id.value().toString())); }
 
         @Override
         public Optional<User> findByEmail(UserEmail email) {
@@ -33,7 +30,7 @@ public class UserRegistrationServiceTest {
 
         @Override
         public void save(User user) {
-            store.put(user.id().value(), user);
+            store.put(user.id().value().toString(), user);
         }
 
         @Override
@@ -51,19 +48,19 @@ public class UserRegistrationServiceTest {
         UserRepository userRepo = new InMemoryUserRepository();
         UserRegistrationService service = createService(userRepo);
 
-        UserId id = UserId.of("u-1");
+        UserId userId = UserId.of(UUID.randomUUID());
         UserEmail email = UserEmail.of("new@example.com");
 
         User user = service.register(
-                id.value(),
+                userId.value().toString(),
                 email.value(),
                 "Francisco"
         );
 
-        assertThat(user.id()).isEqualTo(id);
+        assertThat(user.id().value()).isEqualTo(userId.value());
         assertThat(user.email()).isEqualTo(email);
         assertThat(user.displayName()).isEqualTo("Francisco");
-        assertThat(userRepo.findById(id)).contains(user);
+        assertThat(userRepo.findById(userId)).contains(user);
     }
 
     @Test
@@ -71,15 +68,15 @@ public class UserRegistrationServiceTest {
         UserRepository userRepo = new InMemoryUserRepository();
         UserRegistrationService service = createService(userRepo);
 
-        UserId id1 = UserId.of("u-1");
+        UserId id1 = UserId.of(UUID.randomUUID());
         UserEmail email = UserEmail.of("dup@example.com");
 
-        service.register(id1.value(), email.value(), "Fran");
+        service.register(id1.value().toString(), email.value(), "Fran");
 
-        UserId id2 = UserId.of("u-2");
+        UserId id2 = UserId.of(UUID.randomUUID());
 
         assertThatThrownBy(() ->
-                service.register(id2.value(), email.value(), "Fran")
+                service.register(id2.value().toString(), email.value(), "Fran")
         )
                 .isInstanceOf(UserAlreadyExistsException.class)
                 .hasMessageContaining(String.format(UserAlreadyExistsException.MESSAGE, email.value()));
