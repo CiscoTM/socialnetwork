@@ -1,120 +1,220 @@
 # Social Network Backend
-Arquitectura Hexagonal • Spring Boot 4 • JPA/Hibernate • Liquibase • Testcontainers
+Arquitectura Hexagonal • Spring Boot 3.2.1 • JPA/Hibernate • Liquibase • Testcontainers • Multipass
 
-Este proyecto implementa la base de un backend profesional para una red social, siguiendo principios de arquitectura limpia, separación de capas, pruebas de integración reales y un flujo de trabajo orientado a capítulos (features) para aprendizaje y escalabilidad.
+Este proyecto implementa un backend profesional para una red social, siguiendo principios de arquitectura limpia, separación estricta de capas, pruebas de integración reales y un flujo de trabajo basado en capítulos (features) para aprendizaje, escalabilidad y mantenibilidad.
 
 ---
 
-## 🚀 Tecnologías principales
+# 🚀 Tecnologías principales
 
 - **Java 21**
-- **Spring Boot 4**
+- **Spring Boot 3.2.1**
 - **Arquitectura Hexagonal (Ports & Adapters)**
-- **JPA/Hibernate 7**
+- **Spring Security 6**
+- **JPA/Hibernate 6.4+**
 - **Liquibase** (migraciones de base de datos)
 - **PostgreSQL**
 - **Testcontainers** (tests de integración reales)
+- **Multipass** (backend de Docker en Windows)
 - **JUnit 6 + AssertJ**
 - **Maven**
 
 ---
 
-## 🧱 Arquitectura del proyecto
+# 🧱 Arquitectura del proyecto
+
 src/
 ├── main/
-│    ├── java/com/example/socialnetwork/
-│    │     ├── domain/        → Reglas de negocio (entidades, VOs, repositorios)
-│    │     ├── application/   → Casos de uso (servicios)
-│    │     ├── infrastructure/→ Adaptadores (JPA, persistencia, mappers)
-│    │     └── delivery/      → Controladores REST y DTOs
-│    └── resources/
-│          ├── application.yml
-│          └── db/changelog/  → Migraciones Liquibase
+│   ├── java/com/example/socialnetwork/
+│   │   ├── domain/          → Reglas de negocio (entidades, VOs, repositorios)
+│   │   ├── application/     → Casos de uso (servicios)
+│   │   ├── infrastructure/  → Adaptadores (JPA, persistencia, mappers, seguridad)
+│   │   └── delivery/        → Controladores REST y DTOs
+│   └── resources/
+│       ├── application.yml
+│       └── db/changelog/    → Migraciones Liquibase
 └── test/
-├── java/...            → Tests de integración y unitarios
+├── java/...             → Tests unitarios y de integración
 └── resources/
 └── application-test.yml
 
 
----
+La arquitectura sigue el patrón **Hexagonal / Ports & Adapters**, donde:
 
-## 📦 Funcionalidades implementadas por capítulos
-
-### **Capítulo 1–4**
-- Configuración inicial del proyecto
-- Arquitectura hexagonal
-- Entidades de dominio (`User`, `UserId`, `UserEmail`)
-- Repositorios de dominio
-
-### **Capítulo 5 — Persistencia**
-- Implementación de persistencia con JPA/Hibernate
-- Adaptador `UserRepositoryJpaAdapter`
-- Entidad `UserEntity`
-- Migraciones Liquibase (`users` table)
-- Testcontainers + PostgreSQL real para tests
-
-### **Capítulo 6 — Manejo global de errores**
-- `ApiError` (DTO estándar de error)
-- `ApiErrorHandler` con `@RestControllerAdvice`
-- Excepciones de dominio:
-    - `UserAlreadyExistsException`
-    - `InvalidEmailException`
-    - `InvalidDisplayNameException`
-- Tests de integración para errores 400 y 409
+- **domain** contiene la lógica de negocio pura
+- **application** orquesta casos de uso
+- **infrastructure** implementa adaptadores (JPA, seguridad, mappers…)
+- **delivery** expone la API REST
 
 ---
 
-## 🗄️ Base de datos
+# 🔐 Seguridad (Producción vs Tests)
 
-El proyecto usa **Liquibase** para gestionar el esquema.
+El proyecto separa completamente la seguridad entre entornos:
 
-Migración principal:
+### ✔ Seguridad en producción (`SecurityConfig`)
+- Solo se carga en perfiles distintos de `test`
+- Usa **BCryptPasswordEncoder**
+- Requiere autenticación básica
+- Protege todos los endpoints excepto `/actuator/health`
 
-db/changelog/db.changelog-master.yaml
-db/changelog/001-create-users-table.yaml
+### ✔ Seguridad en tests (`TestSecurityConfig`)
+- Solo se carga en tests
+- Define usuarios en memoria:
+    - `admin/password`
+    - `test@example.com/password123`
+- Desactiva CSRF
+- Usa **NoOpPasswordEncoder**
+- Facilita pruebas sin fricción
 
-
-Tabla creada:
-
-users (
-id VARCHAR(50) PRIMARY KEY,
-email VARCHAR(255) UNIQUE NOT NULL,
-display_name VARCHAR(255) NOT NULL,
-created_at TIMESTAMP NOT NULL
-)
-
-
----
-
-## 🧪 Tests
-
-Los tests de integración usan:
-
-- **Testcontainers** para levantar PostgreSQL real
-- **Liquibase** ejecutado automáticamente en cada test
-- `IntegrationTestBase` para inicializar el contenedor antes del contexto de Spring
-
-Ejemplo:
+### ✔ Exclusión explícita en WebMvcTest
+Los slice tests excluyen la seguridad real:
 
 ```java
-@SpringBootTest
-@AutoConfigureMockMvc
-class UserControllerErrorHandlingIntegrationTest extends IntegrationTestBase { ... }
+excludeFilters = @ComponentScan.Filter(
+    type = FilterType.ASSIGNABLE_TYPE,
+    classes = SecurityConfig.class
+)
+Esto garantiza que los tests no dependan de la seguridad de producción.
+
+🧪 Tests de integración con Testcontainers
+Los tests usan una base de datos PostgreSQL real mediante Testcontainers:
+
+java
+@Container
+static PostgreSQLContainer<?> postgres =
+        new PostgreSQLContainer<>("postgres:15-alpine");
+Liquibase se ejecuta automáticamente en cada test gracias a:
+
+java
+@DynamicPropertySource
+static void configure(DynamicPropertyRegistry registry) { ... }
+✔ Beneficios
+Tests reproducibles
+
+Aislados del entorno local
+
+Sin necesidad de instalar PostgreSQL
+
+🖥️ Multipass como backend de Docker (Windows)
+Para evitar problemas con Docker Desktop en Windows, el proyecto soporta ejecutar Testcontainers usando Multipass:
+
+1. Crear VM Ubuntu
+bash
+multipass launch --name docker-vm --cpus 4 --memory 6G --disk 30G
+2. Instalar Docker dentro de la VM
+bash
+multipass shell docker-vm
+sudo apt update
+sudo apt install -y docker.io
+sudo usermod -aG docker $USER
+exit
+multipass shell docker-vm
+3. Exponer Docker Engine por TCP
+Editar:
+
+Código
+/lib/systemd/system/docker.service
+Cambiar:
+
+Código
+ExecStart=/usr/bin/dockerd -H fd://
+Por:
+
+Código
+ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2375
+Reiniciar:
+
+bash
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+4. Configurar Windows
+bash
+setx DOCKER_HOST "tcp://<IP-de-la-VM>:2375"
+5. Validar
+bash
+docker ps
+Si responde → Testcontainers usará esta VM automáticamente.
+
+🧪 Base de datos
+El proyecto usa Liquibase para gestionar el esquema.
+
+Migraciones:
+
+Código
+db/changelog/db.changelog-master.yaml
+db/changelog/001-create-users-table.yaml
+...
+Ejemplo de tabla:
+
+Código
+users (
+  id VARCHAR(50) PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  display_name VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP NOT NULL
+)
+📦 Funcionalidades implementadas por capítulos
+Capítulos 1–4
+Configuración inicial
+
+Arquitectura hexagonal
+
+Entidades de dominio (User, UserId, UserEmail)
+
+Capítulo 5 — Persistencia
+Adaptador JPA
+
+Entidad UserEntity
+
+Migraciones Liquibase
+
+Testcontainers + PostgreSQL real
+
+Capítulo 6 — Manejo global de errores
+ApiError
+
+ApiErrorHandler
+
+Excepciones de dominio
+
+Tests de integración
+
+Capítulo 7+
+Sistema de follows
+
+Publicaciones
+
+Comentarios
+
+Seguridad
+
+Tests de integración avanzados
 
 ▶️ Ejecución del proyecto
 Modo normal
+bash
 mvn spring-boot:run
 Ejecutar tests
+bash
 mvn clean test
-
-🌱 Flujo de trabajo por capítulos (Git)
+🌱 Flujo de trabajo Git por capítulos
 Cada capítulo se desarrolla en una rama:
 
-feature/chapter-5-persistence
-feature/chapter-6-error-handling
-feature/chapter-7-follow-system
+Código
+feature/05-persistence
+feature/06-error-handling
+feature/07-follow-system
+feature/18-openapi
 ...
-Y se fusiona en develop mediante Pull Requests.
+Las reparaciones se gestionan en ramas:
+
+Código
+fix/testing-security-and-testcontainers
+Y se fusionan mediante Pull Requests hacia develop.
 
 📄 Licencia
 Proyecto educativo. Uso libre.
+
+
+
