@@ -11,8 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 
@@ -22,11 +25,21 @@ import java.util.UUID;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
+
+@WebMvcTest(
+        controllers = FollowController.class,
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = com.example.socialnetwork.infrastructure.security.SecurityConfig.class
+        )
+)
 @Import(TestSecurityConfig.class)
-@WebMvcTest(FollowController.class)
+@ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = true)
 class FollowControllerTest {
+
 
     @Autowired
     private MockMvc mockMvc;
@@ -50,6 +63,7 @@ class FollowControllerTest {
         when(service.execute(any(), any())).thenReturn(follow);
 
         mockMvc.perform(post("/api/follows")
+                        .with(csrf())
                         .header("Authorization", auth())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -69,6 +83,7 @@ class FollowControllerTest {
                 .thenThrow(new SelfFollowNotAllowedException("A user cannot follow themselves"));
 
         mockMvc.perform(post("/api/follows")
+                        .with(csrf())
                         .header("Authorization", auth())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
