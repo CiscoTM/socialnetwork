@@ -15,19 +15,8 @@ import support.IntegrationTestBase;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@ActiveProfiles("test")
-class LiquibaseExecutionTest extends IntegrationTestBase {
-
-    @Configuration
-    @ImportAutoConfiguration({
-            DataSourceAutoConfiguration.class,
-            JdbcTemplateAutoConfiguration.class,
-            LiquibaseAutoConfiguration.class
-    })
-    static class MinimalConfig {
-        // No escanea tu aplicación
-        // Solo activa la autoconfiguración necesaria
-    }
+@ActiveProfiles("integration")
+class LiquibaseExecutionTest {
 
     @Autowired
     JdbcTemplate jdbc;
@@ -41,3 +30,4 @@ class LiquibaseExecutionTest extends IntegrationTestBase {
         assertThat(count).isEqualTo(1);
     }
 }
+

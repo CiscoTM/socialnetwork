@@ -18,13 +18,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         useDefaultFilters = false,
         excludeFilters = @ComponentScan.Filter(
                 type = FilterType.ASSIGNABLE_TYPE,
-                classes = {}
+                classes = com.example.socialnetwork.infrastructure.security.SecurityConfig.class
         )
 )
-@AutoConfigureMockMvc
-@Import(TestSecurityConfig.class)   // ← IMPORTANTE
+@Import(TestSecurityConfig.class)
 @ActiveProfiles("test")
+@AutoConfigureMockMvc
 class SecurityIntegrationTest {
+
 
     @Autowired
     private MockMvc mockMvc;

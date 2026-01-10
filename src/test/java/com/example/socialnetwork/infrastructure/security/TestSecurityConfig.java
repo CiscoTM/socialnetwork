@@ -15,14 +15,11 @@ import org.springframework.security.web.SecurityFilterChain;
 public class TestSecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().authenticated()
-                )
+                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
-
         return http.build();
     }
 
@@ -30,14 +27,18 @@ public class TestSecurityConfig {
     public UserDetailsService userDetailsService() {
         return new InMemoryUserDetailsManager(
                 User.withUsername("admin")
-                        .password("password") // sin codificar para simplificar tests
+                        .password("password")
                         .roles("ADMIN")
+                        .build(),
+                User.withUsername("test@example.com")
+                        .password("password123")
+                        .roles("USER")
                         .build()
         );
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance(); // evita BCrypt en tests
+        return NoOpPasswordEncoder.getInstance();
     }
 }
