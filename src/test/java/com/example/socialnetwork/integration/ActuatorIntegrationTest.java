@@ -11,7 +11,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
                 "spring.liquibase.enabled=false",
-                "management.health.db.enabled=false"
+                "management.health.db.enabled=false",
+                "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration"
         }
 )
 @AutoConfigureWebTestClient
@@ -50,4 +51,3 @@ class ActuatorIntegrationTest {
                 .expectStatus().isOk();
     }
 }
-
