@@ -7,7 +7,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {
+                "spring.liquibase.enabled=false",
+                "management.health.db.enabled=false"
+        }
+)
 @AutoConfigureWebTestClient
 @ActiveProfiles("test")
 class ActuatorIntegrationTest {
@@ -44,3 +50,4 @@ class ActuatorIntegrationTest {
                 .expectStatus().isOk();
     }
 }
+
