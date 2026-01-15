@@ -13,7 +13,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@Profile("!test")   // ⬅️ CLAVE: no se carga en tests
+@Profile({"prod", "docker"})
 public class SecurityConfig {
 
     @Bean
@@ -24,7 +24,10 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/actuator/health",
+                                "/actuator/health/liveness",
+                                "/actuator/health/readiness"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

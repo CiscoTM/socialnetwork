@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db:5432/backend_social_network
+    username: admin
+    password: admin
+
+  liquibase:
+    enabled: true
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      probes:
+        enabled: true
