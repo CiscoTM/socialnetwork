@@ -2,11 +2,14 @@ package com.example.socialnetwork.application.post;
 
 import com.example.socialnetwork.application.post.exception.PostNotFoundException;
 import com.example.socialnetwork.application.post.service.PostApplicationService;
+import com.example.socialnetwork.application.post.service.PostMetrics;
 import com.example.socialnetwork.domain.post.AuthorId;
 import com.example.socialnetwork.domain.post.Post;
 import com.example.socialnetwork.domain.post.PostContent;
 import com.example.socialnetwork.domain.post.PostId;
 import com.example.socialnetwork.domain.post.ports.PostRepository;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.util.Optional;
@@ -18,7 +21,12 @@ public class GetPostByIdTest {
     @Test
     void shouldReturnPostWhenExists(){
         PostRepository repository = mock(PostRepository.class);
-        PostApplicationService service = new PostApplicationService(repository);
+        PostMetrics postMetrics = mock(PostMetrics.class);
+        MeterRegistry meterRegistry = mock(MeterRegistry.class);
+
+        PostApplicationService service =
+                new PostApplicationService(repository, postMetrics, meterRegistry);
+
 
         PostId id = PostId.generate();
         Post post = Post.restore(
@@ -36,7 +44,12 @@ public class GetPostByIdTest {
     @Test
     void shouldThrowExceptionWhenPostDoesNotExist(){
         PostRepository repository = mock(PostRepository.class);
-        PostApplicationService service = new PostApplicationService(repository);
+        PostMetrics postMetrics = mock(PostMetrics.class);
+        MeterRegistry meterRegistry = mock(MeterRegistry.class);
+
+        PostApplicationService service =
+                new PostApplicationService(repository, postMetrics, meterRegistry);
+
 
         UUID id = UUID.randomUUID();
 
