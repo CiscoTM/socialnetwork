@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import com.example.socialnetwork.delivery.shared.logging.ControllerLogging;
+import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
@@ -18,6 +20,9 @@ import java.net.URI;
 @RestController
 @RequestMapping("/api/comments")
 public class CommentController {
+
+    private static final Logger log = ControllerLogging.getLogger(CommentController.class);
+
     private final CreateCommentService service;
 
     public CommentController(CreateCommentService service) {
@@ -31,7 +36,8 @@ public class CommentController {
                 PostId.of(request.postId()),
                 request.content()
         );
-//        return ResponseEntity.ok(CommentMapper.toResponse(comment));
+        log.info("comment.create.success commentId={} postId={} authorId={}", comment.id().value(), comment.postId().value(), comment.authorId().value());
+
         return ResponseEntity .created(URI.create("/api/comments/" + comment.id().value())) .body(CommentMapper.toResponse(comment));
     }
 

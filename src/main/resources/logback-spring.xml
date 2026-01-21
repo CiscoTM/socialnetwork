@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+
+    <!-- Appender JSON estructurado -->
+    <appender name="CONSOLE_JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+
+                <!-- Timestamp estándar -->
+                <timestamp>
+                    <timeZone>UTC</timeZone>
+                </timestamp>
+
+                <!-- Nivel de log -->
+                <logLevel/>
+
+                <!-- Logger -->
+                <loggerName/>
+
+                <!-- Hilo -->
+                <threadName/>
+
+                <!-- Mensaje -->
+                <message/>
+
+                <!-- Excepción -->
+                <throwable/>
+
+                <!-- MDC (correlationId, httpMethod, httpPath, etc.) -->
+                <mdc/>
+
+            </providers>
+        </encoder>
+    </appender>
+
+    <!-- Nivel raíz -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE_JSON"/>
+    </root>
+
+</configuration>

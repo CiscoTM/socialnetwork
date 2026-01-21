@@ -11,10 +11,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.socialnetwork.delivery.shared.logging.ControllerLogging;
+import org.slf4j.Logger;
 
 @RestController
 @RequestMapping("/api/follows")
 public class FollowController {
+
+    private static final Logger log = ControllerLogging.getLogger(FollowController.class);
+
     private final FollowUserService service;
 
     public FollowController(FollowUserService service) {
@@ -27,6 +32,11 @@ public class FollowController {
                 AuthorId.of(request.follower()),
                 AuthorId.of(request.followed())
                 );
+        log.info("follow.create.success follower={} followed={} followId={}",
+                follow.followerId().value(),
+                follow.followedId().value(),
+                follow.id().value());
+
         return ResponseEntity.ok(FollowMapper.toResponse(follow));
     }
 

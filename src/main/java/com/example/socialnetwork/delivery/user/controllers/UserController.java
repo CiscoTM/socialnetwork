@@ -1,6 +1,7 @@
 package com.example.socialnetwork.delivery.user.controllers;
 
 import com.example.socialnetwork.application.user.service.UserRegistrationService;
+import com.example.socialnetwork.delivery.shared.logging.ControllerLogging;
 import com.example.socialnetwork.delivery.user.dtos.UserRegistrationRequest;
 import com.example.socialnetwork.delivery.user.dtos.UserResponse;
 import com.example.socialnetwork.domain.user.User;
@@ -13,10 +14,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.slf4j.Logger;
+
 @Tag(name = "Users", description = "Operaciones relacionadas con usuarios")
 @RestController
 @RequestMapping("/users")
 public class UserController {
+
+    private static final Logger log =  ControllerLogging.getLogger(UserController.class);
 
     private final UserRegistrationService registrationService;
 
@@ -42,6 +47,9 @@ public class UserController {
         );
 
         UserResponse response = UserResponse.fromDomain(user);
+
+        log.info("user.register.success userId={} email={}", user.id().value(), user.email().value());
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
