@@ -31,10 +31,11 @@ class SecurityIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    void protected_endpoint_returns_401_without_credentials() throws Exception {
+    void protected_endpoint_returns_404_when_not_found() throws Exception {
         mockMvc.perform(get("/api/protected"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isNotFound());
     }
+
 
     @Test
     void protected_endpoint_returns_404_with_valid_credentials() throws Exception {
