@@ -1,4 +1,7 @@
 spring:
+  security:
+    enabled: false   # 🔥 Desactiva SecurityConfig en TODOS los tests
+
   jpa:
     hibernate:
       ddl-auto: none
@@ -6,16 +9,18 @@ spring:
   liquibase:
     enabled: true
 
-  security:
-    csrf:
-      enabled: false
+security:
+  csrf:
+    enabled: false
+  jwt:
+    secret: "$2a$10$np7rd9u6hQQKxX2cUKkhnek8K2k8GDNSL6qIgPCaNt6tmdHL2Q3wO"
+    expiration: 3600000
 
 management:
   endpoints:
     web:
       exposure:
         include: "*"
-
   endpoint:
     health:
       probes:

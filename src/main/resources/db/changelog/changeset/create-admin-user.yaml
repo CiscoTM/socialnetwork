@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 22-create-admin-user
+      author: francisco
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  value: 00000000-0000-0000-0000-000000000001
+              - column:
+                  name: email
+                  value: admin@example.com
+              - column:
+                  name: display_name
+                  value: Administrator
+              - column:
+                  name: created_at
+                  valueDate: 2024-01-01T00:00:00Z
+              - column:
+                  name: username
+                  value: admin
+              - column:
+                  name: password
+                  value: "$2a$10$wPnc48kPqOF5q6fo9KC9LuDJRUsd3WaMplmZr7cR3MRCAiOayQICG"
+              - column:
+                  name: role
+                  value: ADMIN

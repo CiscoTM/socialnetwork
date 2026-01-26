@@ -2,6 +2,12 @@ spring:
   application:
     name: socialnetwork
 
+  security:
+    enabled: true   # 🔥 Seguridad activada explícitamente
+    jwt:
+      secret: "rpoeVRlEjaXO0YvU7sn1mfhZ7RJm8GtjYvWA1vbz+bQ="
+      expiration: 3600000
+
   datasource:
     url: jdbc:postgresql://localhost:5433/backend_social_network
     username: admin
@@ -35,3 +41,5 @@ management:
   metrics:
     tags:
       application: socialnetwork
+
+

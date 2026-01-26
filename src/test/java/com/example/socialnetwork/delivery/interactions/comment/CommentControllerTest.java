@@ -33,8 +33,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("integration")
-@AutoConfigureMockMvc(addFilters = true)
+@ActiveProfiles("test")
+@AutoConfigureMockMvc(addFilters = false)
 @Import(TestSecurityConfig.class)
 class CommentControllerTest extends RestIntegrationTestBase {
 

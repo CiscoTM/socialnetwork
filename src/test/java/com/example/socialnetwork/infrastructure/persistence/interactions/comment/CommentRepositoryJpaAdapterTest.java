@@ -73,7 +73,10 @@ class CommentRepositoryJpaAdapterTest {
                 authorIdValue,
                 "user@test.com",
                 "User Name",
-                Instant.now()
+                Instant.now(),
+                "user@test.com",
+                "USER",
+                ""
         ));
 
         CommentId id = CommentId.generate();

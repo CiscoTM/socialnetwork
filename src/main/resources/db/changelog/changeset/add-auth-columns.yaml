@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: 23-add-auth-columns
+      author: francisco
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  type: varchar(255)
+                  defaultValue: 'unknown'
+              - column:
+                  name: password
+                  type: varchar(255)
+                  defaultValue: ''
+              - column:
+                  name: role
+                  type: varchar(50)
+                  defaultValue: 'USER'
+
