@@ -16,10 +16,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(properties = "spring.security.enabled=true")
+@SpringBootTest(
+        properties = {
+                "spring.security.enabled=true",
+                "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration"
+        }
+)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import(SecurityConfig.class)
 class JwtSecurityIntegrationTest {
 
     @Autowired
