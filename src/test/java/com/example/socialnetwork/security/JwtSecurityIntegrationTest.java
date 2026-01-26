@@ -16,10 +16,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(properties = "spring.security.enabled=true")
+@SpringBootTest(properties = {
+        "spring.security.enabled=true",
+        "spring.liquibase.enabled=false"
+})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class JwtSecurityIntegrationTest {
+
 
     @Autowired
     private MockMvc mockMvc;
