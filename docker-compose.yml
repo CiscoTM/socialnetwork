@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:15-alpine
@@ -16,7 +14,6 @@ services:
       timeout: 5s
       retries: 5
 
-
   app:
     build: .
     container_name: socialnetwork-app
@@ -28,6 +25,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/backend_social_network
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: admin
+      JWT_SECRET: "q7zE5M9cT0p4yQeW2F8Yj1H9xC0ZzKJ6N3D2Lw=="  # 👈 AÑADIR
     ports:
       - "8080:8080"
-

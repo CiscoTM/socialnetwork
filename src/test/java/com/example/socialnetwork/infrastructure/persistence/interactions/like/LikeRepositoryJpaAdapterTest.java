@@ -80,7 +80,10 @@ public class LikeRepositoryJpaAdapterTest {
                 userIdValue,
                 "user@test.com",
                 "User Name",
-                Instant.now()
+                Instant.now(),
+                "user@test.com",
+                "USER",
+                ""
         ));
 
         LikeId id = LikeId.generate();

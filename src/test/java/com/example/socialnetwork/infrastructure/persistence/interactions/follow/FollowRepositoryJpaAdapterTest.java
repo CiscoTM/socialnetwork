@@ -66,14 +66,20 @@ class FollowRepositoryJpaAdapterTest {
                 followerIdValue,
                 "follower@test.com",
                 "Follower",
-                Instant.now()
+                Instant.now(),
+                "follower@test.com",
+                "USER",
+                ""
         ));
 
         userRepository.save(new UserEntity(
                 followedIdValue,
                 "followed@test.com",
                 "Followed",
-                Instant.now()
+                Instant.now(),
+                "followed@test.com",
+                "USER",
+                ""
         ));
 
         FollowId id = FollowId.generate();

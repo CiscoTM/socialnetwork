@@ -61,7 +61,10 @@ public class UserRepositoryJpaAdapter implements UserRepository {
                 u.id().value(),
                 u.email().value(),
                 u.displayName(),
-                u.createdAt()
+                u.createdAt(),
+                u.email().value(),
+                "USER",
+                ""
         );
     }
 }

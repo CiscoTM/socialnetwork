@@ -16,19 +16,16 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
                     nullable: false
-
               - column:
                   name: email
                   type: varchar(255)
                   constraints:
                     nullable: false
-
               - column:
                   name: display_name
                   type: varchar(255)
                   constraints:
                     nullable: false
-
               - column:
                   name: created_at
                   type: timestamp with time zone
@@ -39,6 +36,11 @@ databaseChangeLog:
             tableName: users
             columnNames: email
             constraintName: uq_users_email
+  - include:
+      file: db/changelog/changeset/add-auth-columns.yaml
+
+  - include:
+      file: db/changelog/changeset/create-admin-user.yaml
 
   - include:
       file: db/changelog/changeset/create-interactions-tables.yaml
