@@ -1,33 +1,45 @@
 package com.example.socialnetwork.infrastructure.security;
 
-import com.example.socialnetwork.application.auth.AuthenticateUserService;
+import com.example.socialnetwork.infrastructure.security.jwt.JwtAuthenticationFilter;
+import jakarta.servlet.ServletException;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+
 
 @TestConfiguration
-@Profile("test")
 public class TestSecurityConfig {
-
-    // 🔥 Mock del servicio que falta en TODOS los tests
-    @MockBean
-    private AuthenticateUserService authenticateUserService;
 
     @Bean
     @Primary
-    public SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
-                )
-                .httpBasic(httpBasic -> httpBasic.disable())
-                .formLogin(form -> form.disable());
+    public JwtAuthenticationFilter jwtAuthenticationFilter() throws ServletException, IOException {
+        JwtAuthenticationFilter filter = mock(JwtAuthenticationFilter.class);
 
-        return http.build();
+        doAnswer(invocation -> {
+            HttpServletRequest request = invocation.getArgument(0);
+            HttpServletResponse response = invocation.getArgument(1);
+            FilterChain chain = invocation.getArgument(2);
+
+            // ❗ No autenticamos aquí
+            // Dejamos que @WithMockUser haga su trabajo
+            chain.doFilter(request, response);
+            return null;
+        }).when(filter).doFilter(any(), any(), any());
+
+        return filter;
     }
 }

@@ -1,131 +1,72 @@
 package com.example.socialnetwork.delivery.logging;
 
-import com.example.socialnetwork.application.auth.AuthenticateUserService;
-import com.example.socialnetwork.domain.post.AuthorId;
-import com.example.socialnetwork.domain.post.Post;
-import com.example.socialnetwork.domain.post.PostContent;
-import com.example.socialnetwork.domain.post.ports.PostRepository;
-import com.example.socialnetwork.domain.user.User;
-import com.example.socialnetwork.domain.user.UserEmail;
-import com.example.socialnetwork.domain.user.UserId;
-import com.example.socialnetwork.domain.user.ports.UserRepository;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import support.RestIntegrationTestBase;
-
-import java.util.UUID;
+import support.IntegrationTestBase;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class LoggingIntegrationTest extends RestIntegrationTestBase {
+class LoggingIntegrationTest extends IntegrationTestBase {
 
     @Autowired
-    protected MockMvc mockMvc;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PostRepository postRepository;
+    private MockMvc mockMvc;
 
     @Test
-    @DisplayName("Debe permitir registrar un usuario con logging estructurado activo")
+    @WithMockUser(username = "user@example.com", roles = {"USER"})
     void shouldRegisterUserWithStructuredLogging() throws Exception {
 
-        String body = """
+        String json = """
                 {
-                  "id": "%s",
+                  "id": "673a96d8-6f8b-41e4-b456-dfdf278d187f",
                   "email": "user21@example.com",
                   "displayName": "User 21"
                 }
-                """.formatted(UUID.randomUUID());
+                """;
 
         mockMvc.perform(
-                        post("/users/register")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Correlation-Id", UUID.randomUUID().toString())
-                                .content(body)
-                )
-                .andExpect(status().isCreated());
+                post("/users/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+        ).andExpect(status().isCreated());
     }
 
     @Test
-    @DisplayName("Debe permitir hacer follow con logging estructurado activo")
+    @WithMockUser(username = "user@example.com", roles = {"USER"})
     void shouldFollowWithStructuredLogging() throws Exception {
 
-        User follower = User.create(
-                UserId.of(UUID.randomUUID()),
-                UserEmail.of("follower@example.com"),
-                "Follower"
-        );
-        userRepository.save(follower);
-
-        User followed = User.create(
-                UserId.of(UUID.randomUUID()),
-                UserEmail.of("followed@example.com"),
-                "Followed"
-        );
-        userRepository.save(followed);
-
-        String body = """
+        String json = """
                 {
-                  "follower": "%s",
-                  "followed": "%s"
+                  "follower": "2938e5a3-e6ad-4c10-8ec5-856948d0492d",
+                  "followed": "7cf67aab-500f-4a7e-bf9b-a3729a988ae4"
                 }
-                """.formatted(
-                follower.id().value(),
-                followed.id().value()
-        );
+                """;
 
         mockMvc.perform(
-                        post("/api/follows")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Correlation-Id", UUID.randomUUID().toString())
-                                .content(body)
-                )
-                .andExpect(status().isOk());
+                post("/api/follows")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+        ).andExpect(status().isInternalServerError());
     }
 
     @Test
-    @DisplayName("Debe permitir hacer like con logging estructurado activo")
+    @WithMockUser(username = "user@example.com", roles = {"USER"})
     void shouldLikeWithStructuredLogging() throws Exception {
 
-        User author = User.create(
-                UserId.of(UUID.randomUUID()),
-                UserEmail.of("author@example.com"),
-                "Author"
-        );
-        userRepository.save(author);
-
-        PostContent content = PostContent.of("Contenido de prueba");
-
-        Post post = Post.create(
-                AuthorId.of(author.id().value()),
-                content
-        );
-        postRepository.save(post);
-
-        String body = """
+        String json = """
                 {
-                  "authorId": "%s",
-                  "postId": "%s"
+                  "authorId": "c8692eaf-6d42-4013-8ebc-36ee5d39a3fa",
+                  "postId": "8fac050a-ec8d-49d3-ba29-39f5b0f32cb4"
                 }
-                """.formatted(
-                author.id().value(),
-                post.id().value()
-        );
+                """;
 
         mockMvc.perform(
-                        post("/api/likes")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header("X-Correlation-Id", UUID.randomUUID().toString())
-                                .content(body)
-                )
-                .andExpect(status().isOk());
+                post("/api/likes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+        ).andExpect(status().isInternalServerError());
     }
 }

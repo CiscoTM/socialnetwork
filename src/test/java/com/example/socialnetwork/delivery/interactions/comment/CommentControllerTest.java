@@ -10,33 +10,23 @@ import com.example.socialnetwork.domain.user.User;
 import com.example.socialnetwork.domain.user.UserEmail;
 import com.example.socialnetwork.domain.user.UserId;
 import com.example.socialnetwork.domain.user.ports.UserRepository;
-
-import com.example.socialnetwork.infrastructure.security.TestSecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-
-import support.RestIntegrationTestBase;
+import support.IntegrationTestBase;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("test")
-@AutoConfigureMockMvc(addFilters = false)
-@Import(TestSecurityConfig.class)
-class CommentControllerTest extends RestIntegrationTestBase {
+class CommentControllerTest extends IntegrationTestBase {
 
     @Autowired
     private MockMvc mockMvc;
@@ -55,7 +45,6 @@ class CommentControllerTest extends RestIntegrationTestBase {
 
     @BeforeEach
     void setup() {
-
         author = User.create(
                 UserId.of(UUID.randomUUID()),
                 UserEmail.of("test@example.com"),
@@ -71,6 +60,8 @@ class CommentControllerTest extends RestIntegrationTestBase {
     }
 
     @Test
+    @DisplayName("Debe crear un comentario correctamente")
+    @WithMockUser(username = "test@example.com", roles = {"USER"})
     void creates_comment_successfully() throws Exception {
 
         String json = """
@@ -85,12 +76,10 @@ class CommentControllerTest extends RestIntegrationTestBase {
         );
 
         mockMvc.perform(
-                        post("/api/comments")
-                                .with(httpBasic("test@example.com", "password123"))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(json)
-                )
-                .andExpect(status().isCreated());
+                post("/api/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+        ).andExpect(status().isCreated());
 
         Optional<Comment> savedOpt =
                 commentRepository.findByPostId(post.id()).stream().findFirst();

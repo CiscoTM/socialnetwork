@@ -7,15 +7,16 @@ import com.example.socialnetwork.domain.interactions.like.LikeId;
 import com.example.socialnetwork.domain.post.AuthorId;
 import com.example.socialnetwork.domain.post.PostId;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.mockito.Mockito.*;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -23,15 +24,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 
-@WebMvcTest(LikeController.class)
-@AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
 public class LikeControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
-    @MockBean
-    private LikePostService service;
+    @Mock private LikePostService service;
+
+    @InjectMocks
+    private LikeController controller;
+
+    @BeforeEach
+    public void setup() {
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(controller)
+                .build();
+    }
 
     @Test
     void creates_like_successfully() throws Exception{

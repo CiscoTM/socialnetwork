@@ -13,44 +13,22 @@ import com.example.socialnetwork.infrastructure.persistence.user.UserEntity;
 import com.example.socialnetwork.infrastructure.persistence.user.jpa.JpaUserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import support.PostgresTestContainer;
 
 import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
-@DataJpaTest
-@Testcontainers
-@ActiveProfiles("test")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DataJpaTest(properties = {
+        "spring.test.database.replace=NONE",
+        "spring.jpa.hibernate.ddl-auto=none",
+        "spring.liquibase.enabled=true"
+})
 @Import(CommentRepositoryJpaAdapter.class)
-class CommentRepositoryJpaAdapterTest {
-
-    @Container
-    static PostgreSQLContainer<?> postgres =
-            new PostgreSQLContainer<>("postgres:15-alpine");
-
-    @DynamicPropertySource
-    static void configure(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("spring.datasource.driver-class-name", postgres::getDriverClassName);
-
-        registry.add("spring.liquibase.enabled", () -> true);
-        registry.add("spring.liquibase.url", postgres::getJdbcUrl);
-        registry.add("spring.liquibase.user", postgres::getUsername);
-        registry.add("spring.liquibase.password", postgres::getPassword);
-    }
+class CommentRepositoryJpaAdapterTest extends PostgresTestContainer {
 
     @Autowired private CommentRepositoryJpaAdapter repository;
     @Autowired private JpaCommentRepository jpaRepository;
@@ -75,8 +53,8 @@ class CommentRepositoryJpaAdapterTest {
                 "User Name",
                 Instant.now(),
                 "user@test.com",
-                "USER",
-                ""
+                "password123",
+                "USER"
         ));
 
         CommentId id = CommentId.generate();

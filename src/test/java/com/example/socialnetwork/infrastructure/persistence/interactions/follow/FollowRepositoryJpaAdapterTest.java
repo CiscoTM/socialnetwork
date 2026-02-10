@@ -9,53 +9,26 @@ import com.example.socialnetwork.infrastructure.persistence.user.UserEntity;
 import com.example.socialnetwork.infrastructure.persistence.user.jpa.JpaUserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import support.PostgresTestContainer;
 
 import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
-@DataJpaTest
-@Testcontainers
-@ActiveProfiles("test")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DataJpaTest(properties = {
+        "spring.test.database.replace=NONE",
+        "spring.jpa.hibernate.ddl-auto=none",
+        "spring.liquibase.enabled=true"
+})
 @Import(FollowRepositoryJpaAdapter.class)
-class FollowRepositoryJpaAdapterTest {
+class FollowRepositoryJpaAdapterTest extends PostgresTestContainer {
 
-    @Container
-    static PostgreSQLContainer<?> postgres =
-            new PostgreSQLContainer<>("postgres:15-alpine");
-
-    @DynamicPropertySource
-    static void configure(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("spring.datasource.driver-class-name", postgres::getDriverClassName);
-
-        registry.add("spring.liquibase.enabled", () -> true);
-        registry.add("spring.liquibase.url", postgres::getJdbcUrl);
-        registry.add("spring.liquibase.user", postgres::getUsername);
-        registry.add("spring.liquibase.password", postgres::getPassword);
-    }
-
-    @Autowired
-    private FollowRepositoryJpaAdapter repository;
-
-    @Autowired
-    private JpaFollowRepository jpaRepository;
-
-    @Autowired
-    private JpaUserRepository userRepository;
+    @Autowired private FollowRepositoryJpaAdapter repository;
+    @Autowired private JpaFollowRepository jpaRepository;
+    @Autowired private JpaUserRepository userRepository;
 
     @Test
     void save_follow_successfully() {
@@ -68,8 +41,8 @@ class FollowRepositoryJpaAdapterTest {
                 "Follower",
                 Instant.now(),
                 "follower@test.com",
-                "USER",
-                ""
+                "password123",
+                "USER"
         ));
 
         userRepository.save(new UserEntity(
@@ -78,8 +51,8 @@ class FollowRepositoryJpaAdapterTest {
                 "Followed",
                 Instant.now(),
                 "followed@test.com",
-                "USER",
-                ""
+                "password123",
+                "USER"
         ));
 
         FollowId id = FollowId.generate();
@@ -98,19 +71,15 @@ class FollowRepositoryJpaAdapterTest {
         assertThat(entity.getFollowed()).isEqualTo(followedIdValue);
     }
 
-
     @Test
     void saving_follow_with_nonexistent_user_should_fail() {
-        // Arrange
         Follow follow = Follow.create(
                 FollowId.generate(),
-                AuthorId.of(UUID.randomUUID()),      // follower inexistente
-                AuthorId.of(UUID.randomUUID())       // followed inexistente
+                AuthorId.of(UUID.randomUUID()),
+                AuthorId.of(UUID.randomUUID())
         );
 
-        // Assert
         assertThatThrownBy(() -> repository.save(follow))
                 .isInstanceOf(Exception.class);
     }
-
 }

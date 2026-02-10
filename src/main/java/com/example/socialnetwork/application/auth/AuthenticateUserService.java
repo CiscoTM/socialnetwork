@@ -1,5 +1,6 @@
 package com.example.socialnetwork.application.auth;
 
+import com.example.socialnetwork.delivery.auth.TokenResponse;
 import com.example.socialnetwork.domain.user.UserEmail;
 import com.example.socialnetwork.domain.user.ports.UserRepository;
 import com.example.socialnetwork.infrastructure.security.jwt.JwtTokenProvider;
@@ -28,29 +29,23 @@ public class AuthenticateUserService {
         this.userRepository = userRepository;
     }
 
-    public String authenticate(String username, String rawPassword) {
+    public TokenResponse authenticate(String username, String rawPassword) {
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-        System.out.println("RAW = " + rawPassword);
-        System.out.println("HASH = " + userDetails.getPassword());
-        System.out.println("MATCHES = " + passwordEncoder.matches(rawPassword, userDetails.getPassword()));
 
         if (!passwordEncoder.matches(rawPassword, userDetails.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
 
-        UserEmail email;
-        try {
-            email = UserEmail.of(userDetails.getUsername());
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid credentials");
-        }
+        UserEmail email = UserEmail.of(userDetails.getUsername());
 
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
+        String accessToken = jwtTokenProvider.generateAccessToken(user.email().value());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.email().value());
 
-        return jwtTokenProvider.generateToken(user.email().value());
+        return new TokenResponse(accessToken, refreshToken);
     }
+
 }
