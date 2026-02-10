@@ -1,11 +1,7 @@
 package com.example.socialnetwork.infrastructure.security.jwt;
 
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -13,44 +9,73 @@ import java.time.Instant;
 import java.util.Date;
 
 @Component
-@ConditionalOnProperty(name = "spring.security.enabled", havingValue = "true", matchIfMissing = true)
 public class JwtTokenProvider {
 
     private final Key key;
-    private final Long expirationMillis;
 
-    public JwtTokenProvider(
-            @Value("${security.jwt.secret}") String secret,
-            @Value("${security.jwt.expiration}") Long expirationMillis
-    ) {
-        //System.out.println("SECRET = " + secret); System.out.println("BYTES = " + secret.getBytes().length);
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
-        this.expirationMillis = expirationMillis;
+    private final long accessTokenValidityMillis = 15 * 60 * 1000;          // 15 min
+    private final long refreshTokenValidityMillis = 7L * 24 * 60 * 60 * 1000; // 7 días
+
+    // Producción
+    public JwtTokenProvider() {
+        this.key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     }
 
-    public String generateToken(String subject) {
+    // Tests (secreto fijo)
+    public JwtTokenProvider(String secret) {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+    }
 
+    public String generateAccessToken(String email) {
         Instant now = Instant.now();
-        Instant expiry = now.plusMillis(expirationMillis);
         return Jwts.builder()
-                .setSubject(subject)
+                .setSubject(email)
                 .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(expiry))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .setExpiration(Date.from(now.plusMillis(accessTokenValidityMillis)))
+                .claim("type", "ACCESS")
+                .signWith(key)
                 .compact();
     }
 
-    public String validateAndGetSubject(String token) {
+    public String generateRefreshToken(String email) {
+        Instant now = Instant.now();
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(now.plusMillis(refreshTokenValidityMillis)))
+                .claim("type", "REFRESH")
+                .signWith(key)
+                .compact();
+    }
 
+    public boolean validateToken(String token) {
         try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .getSubject();
-        } catch (JwtException e) {
-            return null;
+            parse(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
         }
+    }
+
+    public boolean isRefreshToken(String token) {
+        return "REFRESH".equals(parse(token).getBody().get("type", String.class));
+    }
+
+    public String getUsername(String token) {
+        return parse(token).getBody().getSubject();
+    }
+
+    public String validateAndGetSubject(String token) {
+        if (!validateToken(token)) {
+            throw new RuntimeException("Invalid token");
+        }
+        return getUsername(token);
+    }
+
+    private Jws<Claims> parse(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token);
     }
 }

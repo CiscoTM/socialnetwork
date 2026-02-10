@@ -1,11 +1,14 @@
 package com.example.socialnetwork.security;
 
+import com.example.socialnetwork.application.auth.RefreshTokenService;
 import com.example.socialnetwork.delivery.auth.AuthController;
 import com.example.socialnetwork.application.auth.AuthenticateUserService;
+import com.example.socialnetwork.delivery.auth.TokenResponse;
 import com.example.socialnetwork.infrastructure.security.jwt.JwtTokenProvider;
 import com.example.socialnetwork.security.config.SecurityIntegrationTestConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -19,7 +22,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = AuthController.class)
-@Import(SecurityIntegrationTestConfig.class)
+@AutoConfigureMockMvc(addFilters = false)          // desactiva filtros de seguridad
+@Import(SecurityIntegrationTestConfig.class)       // sobrescribe JwtAuthenticationFilter y JwtTokenProvider
 @ActiveProfiles("test")
 @TestPropertySource(properties = "spring.security.enabled=true")
 class AuthControllerTest {
@@ -33,14 +37,16 @@ class AuthControllerTest {
     @MockBean
     private JwtTokenProvider jwtTokenProvider;
 
+    @MockBean
+    private RefreshTokenService refreshTokenService;
+
     @Test
     void login_returns_token() throws Exception {
 
-        String email = "admin@example.com";
-        String password = "password123";
-        String fakeToken = "FAKE.JWT.TOKEN";
+        TokenResponse fakeTokens = new TokenResponse("fakeAccess", "fakeRefresh");
 
-        when(authenticateUserService.authenticate(email, password)).thenReturn(fakeToken);
+        when(authenticateUserService.authenticate("admin@example.com", "password123"))
+                .thenReturn(fakeTokens);
 
         String body = """
                 {

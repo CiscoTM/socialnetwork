@@ -1,23 +1,32 @@
 package com.example.socialnetwork.delivery.auth;
 
 import com.example.socialnetwork.application.auth.AuthenticateUserService;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import com.example.socialnetwork.application.auth.RefreshTokenService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@ConditionalOnProperty(name = "spring.security.enabled", havingValue = "true", matchIfMissing = true)
 @RequestMapping("/auth")
 public class AuthController {
-    private final AuthenticateUserService authService;
 
-    public AuthController(AuthenticateUserService authService) {
+    private final AuthenticateUserService authService;
+    private final RefreshTokenService refreshTokenService;
+
+    public AuthController(AuthenticateUserService authService,
+                          RefreshTokenService refreshTokenService) {
         this.authService = authService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest request) {
-        String token = authService.authenticate(request.username(), request.password());
-        return ResponseEntity.ok(new TokenResponse(token));
+        TokenResponse tokens = authService.authenticate(request.username(), request.password());
+        return ResponseEntity.ok(tokens);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponse> refresh(@RequestBody RefreshRequest request) {
+        TokenResponse tokens = refreshTokenService.refreshAccessToken(request.refreshToken());
+        return ResponseEntity.ok(tokens);
     }
 }

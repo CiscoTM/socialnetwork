@@ -6,46 +6,54 @@ import com.example.socialnetwork.domain.interactions.follow.Follow;
 import com.example.socialnetwork.domain.interactions.follow.FollowId;
 import com.example.socialnetwork.domain.interactions.follow.exceptions.SelfFollowNotAllowedException;
 import com.example.socialnetwork.domain.post.AuthorId;
-import com.example.socialnetwork.infrastructure.security.TestSecurityConfig;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Import;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Base64;
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
-
-@WebMvcTest(
-        controllers = FollowController.class,
-        excludeFilters = @ComponentScan.Filter(
-                type = FilterType.ASSIGNABLE_TYPE,
-                classes = com.example.socialnetwork.infrastructure.security.SecurityConfig.class
-        )
-)
-@Import(TestSecurityConfig.class)
-@ActiveProfiles("test")
-@AutoConfigureMockMvc(addFilters = true)
+@ExtendWith(MockitoExtension.class)
 class FollowControllerTest {
 
-
-    @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Mock
     private FollowUserService service;
+
+    @InjectMocks
+    private FollowController controller;
+
+    @RestControllerAdvice
+    public class GlobalExceptionHandler {
+        @ExceptionHandler(SelfFollowNotAllowedException.class)
+        @ResponseStatus(HttpStatus.BAD_REQUEST)
+        void handleSelfFollow() {}
+    }
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(controller)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
+    }
 
     private String auth() {
         return "Basic " + Base64.getEncoder()
@@ -68,8 +76,8 @@ class FollowControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                "follower":"00000000-0000-0000-0000-000000000001",
-                                "followed":"00000000-0000-0000-0000-000000000002"
+                                  "follower":"00000000-0000-0000-0000-000000000001",
+                                  "followed":"00000000-0000-0000-0000-000000000002"
                                 }
                                 """))
                 .andExpect(status().isOk());
@@ -88,8 +96,8 @@ class FollowControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                "follower":"%s",
-                                "followed":"%s"
+                                  "follower":"%s",
+                                  "followed":"%s"
                                 }
                                 """.formatted(same, same)))
                 .andExpect(status().isBadRequest());

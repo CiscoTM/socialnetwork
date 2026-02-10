@@ -12,57 +12,27 @@ import com.example.socialnetwork.infrastructure.persistence.user.UserEntity;
 import com.example.socialnetwork.infrastructure.persistence.user.jpa.JpaUserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
-import static org.assertj.core.api.Assertions.*;
+import support.PostgresTestContainer;
 
 import java.time.Instant;
 import java.util.UUID;
 
-@DataJpaTest
-@Testcontainers
-@ActiveProfiles("test")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+import static org.assertj.core.api.Assertions.*;
+
+@DataJpaTest(properties = {
+        "spring.test.database.replace=NONE",
+        "spring.jpa.hibernate.ddl-auto=none",
+        "spring.liquibase.enabled=true"
+})
 @Import(LikeRepositoryJpaAdapter.class)
-public class LikeRepositoryJpaAdapterTest {
+class LikeRepositoryJpaAdapterTest extends PostgresTestContainer {
 
-    @Container
-    static PostgreSQLContainer<?> postgres =
-            new PostgreSQLContainer<>("postgres:15-alpine");
-
-    @DynamicPropertySource
-    static void configure(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("spring.datasource.driver-class-name", postgres::getDriverClassName);
-
-        registry.add("spring.liquibase.enabled", () -> true);
-        registry.add("spring.liquibase.url", postgres::getJdbcUrl);
-        registry.add("spring.liquibase.user", postgres::getUsername);
-        registry.add("spring.liquibase.password", postgres::getPassword);
-    }
-
-
-    @Autowired
-    private LikeRepositoryJpaAdapter repository;
-
-    @Autowired
-    private JpaLikeRepository jpaRepository;
-
-    @Autowired
-    private JpaPostRepository postRepository;
-
-    @Autowired
-    private JpaUserRepository userRepository;
+    @Autowired private LikeRepositoryJpaAdapter repository;
+    @Autowired private JpaLikeRepository jpaRepository;
+    @Autowired private JpaPostRepository postRepository;
+    @Autowired private JpaUserRepository userRepository;
 
     @Test
     void save_like_successfully() {
@@ -82,8 +52,8 @@ public class LikeRepositoryJpaAdapterTest {
                 "User Name",
                 Instant.now(),
                 "user@test.com",
-                "USER",
-                ""
+                "password123",
+                "USER"
         ));
 
         LikeId id = LikeId.generate();
@@ -106,14 +76,11 @@ public class LikeRepositoryJpaAdapterTest {
     void saving_like_with_nonexistent_post_should_fail() {
         Like like = Like.create(
                 LikeId.generate(),
-                AuthorId.of(UUID.randomUUID()),  // user inexistente
-                PostId.of(UUID.randomUUID())     // post inexistente
+                AuthorId.of(UUID.randomUUID()),
+                PostId.of(UUID.randomUUID())
         );
 
         assertThatThrownBy(() -> repository.save(like))
                 .isInstanceOf(Exception.class);
     }
-
 }
-
-

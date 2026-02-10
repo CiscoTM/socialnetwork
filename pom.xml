@@ -124,12 +124,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- WebFlux solo para tests -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
-            <scope>test</scope>
-        </dependency>
+
         <!-- JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

@@ -9,8 +9,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
 @Configuration
@@ -29,6 +27,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
@@ -40,14 +39,12 @@ public class SecurityConfig {
                                 "/actuator/health/liveness",
                                 "/actuator/health/readiness",
                                 "/prometheus",
-                                "/auth/login"
+                                "/auth/login",
+                                "/auth/refresh"
                         ).permitAll()
                         .requestMatchers("/users/me").authenticated()
                         .anyRequest().authenticated()
                 )
-                // Si quieres seguir permitiendo basic para otros casos, puedes dejarlo;
-                // pero no es necesario para estos tests.
-                //.httpBasic(withDefaults())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(
                                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)
@@ -61,3 +58,4 @@ public class SecurityConfig {
         return http.build();
     }
 }
+

@@ -1,27 +1,25 @@
 package support;
 
+import com.example.socialnetwork.infrastructure.security.TestJwtTokenProvider;
+import com.example.socialnetwork.infrastructure.security.TestSecurityConfig;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Testcontainers
-@SpringBootTest
-@ActiveProfiles("integration")
-public abstract class IntegrationTestBase {
-
-    @Container
-    static PostgreSQLContainer<?> postgres =
-            new PostgreSQLContainer<>("postgres:16")
-                    .withDatabaseName("socialnetwork")
-                    .withUsername("test")
-                    .withPassword("test");
-
-    static {
-        postgres.start();
-        System.setProperty("spring.datasource.url", postgres.getJdbcUrl());
-        System.setProperty("spring.datasource.username", postgres.getUsername());
-        System.setProperty("spring.datasource.password", postgres.getPassword());
-    }
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+        properties = {
+                "spring.security.enabled=true",
+                "spring.main.allow-bean-definition-overriding=true"
+        }
+)
+@ActiveProfiles("test")
+@AutoConfigureMockMvc
+@Import({TestSecurityConfig.class, TestJwtTokenProvider.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+public abstract class IntegrationTestBase extends PostgresTestContainer {
 }
+
+

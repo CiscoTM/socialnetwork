@@ -21,14 +21,15 @@ import org.slf4j.Logger;
 @RequestMapping("/users")
 public class UserController {
 
-    private static final Logger log =  ControllerLogging.getLogger(UserController.class);
+    private static final Logger log = ControllerLogging.getLogger(UserController.class);
 
     private final UserRegistrationService registrationService;
 
     public UserController(UserRegistrationService registrationService) {
         this.registrationService = registrationService;
-        
+
     }
+
     @Operation(
             summary = "Registrar un nuevo usuario",
             description = "Crea un usuario con email y displayName"

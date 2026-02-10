@@ -1,51 +1,60 @@
 package com.example.socialnetwork.delivery.user.controllers;
 
 import com.example.socialnetwork.application.user.service.UserRegistrationService;
+import com.example.socialnetwork.delivery.interactions.exceptions.GlobalExceptionHandler;
 import com.example.socialnetwork.domain.user.User;
 import com.example.socialnetwork.domain.user.UserEmail;
 import com.example.socialnetwork.domain.user.UserId;
 import com.example.socialnetwork.domain.user.ports.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(UserController.class)
-@AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
 class UserControllerIntegrationTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Mock
     private UserRepository userRepository;
 
-    @MockBean
+    @Mock
     private UserRegistrationService userRegistrationService;
+
+    @InjectMocks
+    private UserController controller;
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(controller)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
+    }
+
 
     @Test
     void registers_user_successfully_via_http() throws Exception {
         UserId id = UserId.generate();
 
-        // Mock del servicio de registro
-        when(userRegistrationService.register(any(),any(),any())).thenReturn(
-                new User(
+        when(userRegistrationService.register(any(), any(), any()))
+                .thenReturn(new User(
                         id,
                         UserEmail.of("http-test@example.com"),
                         "Francisco",
                         java.time.Instant.now()
-                )
-        );
+                ));
 
         String payload = """
                 {

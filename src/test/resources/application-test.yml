@@ -1,8 +1,15 @@
 spring:
   security:
-    enabled: false   # 🔥 Desactiva SecurityConfig en TODOS los tests
+    enabled: false
     csrf:
       enabled: false
+
+  datasource:
+    # Evita que Spring cree un datasource propio.
+    url: jdbc:invalid
+    username: invalid
+    password: invalid
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
@@ -15,7 +22,7 @@ security:
   jwt:
     secret: "$2a$10$np7rd9u6hQQKxX2cUKkhnek8K2k8GDNSL6qIgPCaNt6tmdHL2Q3wO"
     expiration: 3600000
-
+    refresh-expiration: 3600000
 
 management:
   endpoints:
