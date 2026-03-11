@@ -1,15 +1,15 @@
 services:
   db:
     image: postgres:15-alpine
-    container_name: sociannetwork.db
+    container_name: socialnetwork-db
     environment:
       POSTGRES_DB: backend_social_network
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
     ports:
-      - "5432:5432"
+      - "5433:5432"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U admin -d backend_social_network" ]
+      test: ["CMD-SHELL", "pg_isready -U admin -d backend_social_network"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -25,6 +25,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/backend_social_network
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: admin
-      JWT_SECRET: "q7zE5M9cT0p4yQeW2F8Yj1H9xC0ZzKJ6N3D2Lw=="  # 👈 AÑADIR
+      JWT_SECRET: "q7zE5M9cT0p4yQeW2F8Yj1H9xC0ZzKJ6N3D2Lw=="
     ports:
       - "8080:8080"

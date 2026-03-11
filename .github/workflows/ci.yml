@@ -42,7 +42,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Run tests with Maven
+      - name: Run tests with Maven (Testcontainers-friendly)
         run: mvn -B test -Dspring.profiles.active=test
         env:
           TESTCONTAINERS_RYUK_DISABLED: true

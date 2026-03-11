@@ -1,24 +1,14 @@
 package com.example.socialnetwork.delivery.interactions.follow.controllers;
 
 import com.example.socialnetwork.application.interactions.follow.FollowUserService;
-import com.example.socialnetwork.delivery.interactions.follow.FollowMapper;
 import com.example.socialnetwork.delivery.interactions.follow.dtos.FollowRequest;
-import com.example.socialnetwork.delivery.interactions.follow.dtos.FollowResponse;
-import com.example.socialnetwork.domain.interactions.follow.Follow;
-import com.example.socialnetwork.domain.post.AuthorId;
+import com.example.socialnetwork.domain.user.UserId;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.example.socialnetwork.delivery.shared.logging.ControllerLogging;
-import org.slf4j.Logger;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/follows")
 public class FollowController {
-
-    private static final Logger log = ControllerLogging.getLogger(FollowController.class);
 
     private final FollowUserService service;
 
@@ -27,17 +17,13 @@ public class FollowController {
     }
 
     @PostMapping
-    public ResponseEntity<FollowResponse>follow(@RequestBody FollowRequest request){
-        Follow follow = service.execute(
-                AuthorId.of(request.follower()),
-                AuthorId.of(request.followed())
-                );
-        log.info("follow.create.success follower={} followed={} followId={}",
-                follow.followerId().value(),
-                follow.followedId().value(),
-                follow.id().value());
+    public ResponseEntity<?> follow(@RequestBody FollowRequest request) {
 
-        return ResponseEntity.ok(FollowMapper.toResponse(follow));
+        service.execute(
+                UserId.of(request.followerId()),
+                UserId.of(request.followedId())
+        );
+
+        return ResponseEntity.ok().build();
     }
-
 }

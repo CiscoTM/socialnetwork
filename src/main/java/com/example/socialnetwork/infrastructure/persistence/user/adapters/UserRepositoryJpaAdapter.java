@@ -32,19 +32,32 @@ public class UserRepositoryJpaAdapter implements UserRepository {
 
     @Override
     public void save(User user) {
-        try {
-            jpa.save(toEntity(user));
-        } catch (Exception ex) {
-            if (ex.getMessage().contains("users_email_key") || ex.getMessage().contains("unique")) {
-                throw new UserAlreadyExistsException(user.email().value());
-            }
-            throw ex;
-        }
+        // Persistencia de dominio (sin password ni role)
+        UserEntity entity = new UserEntity(
+                user.id().value(),
+                user.email().value(),
+                user.displayName(),
+                user.createdAt(),
+                user.email().value(),   // username = email
+                "",                     // password vacío
+                "USER"                  // role por defecto
+        );
+        jpa.save(entity);
+    }
+
+    @Override
+    public void saveEntity(UserEntity entity) {
+        jpa.save(entity);
     }
 
     @Override
     public boolean existsByEmail(UserEmail email) {
         return jpa.existsByEmail(email.value());
+    }
+
+    @Override
+    public void deleteAll() {
+        jpa.deleteAll();
     }
 
     private User toDomain(UserEntity e) {
@@ -55,16 +68,5 @@ public class UserRepositoryJpaAdapter implements UserRepository {
                 e.getCreatedAt()
         );
     }
-
-    private UserEntity toEntity(User u) {
-        return new UserEntity(
-                u.id().value(),
-                u.email().value(),
-                u.displayName(),
-                u.createdAt(),
-                u.email().value(),
-                "USER",
-                ""
-        );
-    }
 }
+

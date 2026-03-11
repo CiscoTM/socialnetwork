@@ -1,7 +1,7 @@
 package com.example.socialnetwork.delivery.user.controllers;
 
 import com.example.socialnetwork.application.user.service.UserRegistrationService;
-import com.example.socialnetwork.delivery.interactions.exceptions.GlobalExceptionHandler;
+import com.example.socialnetwork.delivery.shared.exceptions.GlobalExceptionHandler;
 import com.example.socialnetwork.domain.user.exceptions.UserAlreadyExistsException;
 import com.example.socialnetwork.domain.user.ports.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,20 +54,21 @@ class UserControllerErrorHandlingTest {
                 .register(any(), any(), any());
 
         String payload = """
-            {
-                "id": "u-2",
-                "email": "duplicate@example.com",
-                "displayName": "Another"
-            }
-            """;
+        {
+          "id": "11111111-1111-1111-1111-111111111111",
+          "email": "duplicate@example.com",
+          "displayName": "Another"
+        }
+        """;
 
         mockMvc.perform(post("/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.status").value(409))
-                .andExpect(jsonPath("$.error").value("Conflict"))
-                .andExpect(jsonPath("$.message")
+                .andExpect(jsonPath("$.title").value("Conflict"))
+                .andExpect(jsonPath("$.detail")
                         .value("A user with email 'duplicate@example.com' already exists"));
     }
+
 }

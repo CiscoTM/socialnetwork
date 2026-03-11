@@ -42,7 +42,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@Valid @RequestBody UserRegistrationRequest request) {
         User user = registrationService.register(
-                request.id(),
+                request.id().toString(),
                 request.email(),
                 request.displayName()
         );
