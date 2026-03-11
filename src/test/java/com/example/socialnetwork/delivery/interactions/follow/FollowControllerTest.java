@@ -5,7 +5,7 @@ import com.example.socialnetwork.delivery.interactions.follow.controllers.Follow
 import com.example.socialnetwork.domain.interactions.follow.Follow;
 import com.example.socialnetwork.domain.interactions.follow.FollowId;
 import com.example.socialnetwork.domain.interactions.follow.exceptions.SelfFollowNotAllowedException;
-import com.example.socialnetwork.domain.post.AuthorId;
+import com.example.socialnetwork.domain.user.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,9 +25,9 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @ExtendWith(MockitoExtension.class)
 class FollowControllerTest {
@@ -41,7 +41,7 @@ class FollowControllerTest {
     private FollowController controller;
 
     @RestControllerAdvice
-    public class GlobalExceptionHandler {
+    static class GlobalExceptionHandler {
         @ExceptionHandler(SelfFollowNotAllowedException.class)
         @ResponseStatus(HttpStatus.BAD_REQUEST)
         void handleSelfFollow() {}
@@ -64,22 +64,24 @@ class FollowControllerTest {
     void creates_follow_successfully() throws Exception {
         Follow follow = Follow.create(
                 FollowId.generate(),
-                AuthorId.of(UUID.randomUUID()),
-                AuthorId.of(UUID.randomUUID())
+                UserId.of(UUID.randomUUID()),
+                UserId.of(UUID.randomUUID())
         );
 
         when(service.execute(any(), any())).thenReturn(follow);
+
+        String json = """
+        {
+          "followerId": "00000000-0000-0000-0000-000000000001",
+          "followedId": "00000000-0000-0000-0000-000000000002"
+        }
+        """;
 
         mockMvc.perform(post("/api/follows")
                         .with(csrf())
                         .header("Authorization", auth())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "follower":"00000000-0000-0000-0000-000000000001",
-                                  "followed":"00000000-0000-0000-0000-000000000002"
-                                }
-                                """))
+                        .content(json))
                 .andExpect(status().isOk());
     }
 
@@ -87,19 +89,21 @@ class FollowControllerTest {
     void self_follow_returns_bad_request() throws Exception {
         UUID same = UUID.randomUUID();
 
-        when(service.execute(AuthorId.of(same), AuthorId.of(same)))
+        when(service.execute(UserId.of(same), UserId.of(same)))
                 .thenThrow(new SelfFollowNotAllowedException("A user cannot follow themselves"));
+
+        String json = """
+        {
+          "followerId": "%s",
+          "followedId": "%s"
+        }
+        """.formatted(same, same);
 
         mockMvc.perform(post("/api/follows")
                         .with(csrf())
                         .header("Authorization", auth())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "follower":"%s",
-                                  "followed":"%s"
-                                }
-                                """.formatted(same, same)))
+                        .content(json))
                 .andExpect(status().isBadRequest());
     }
 }

@@ -6,6 +6,7 @@ import com.example.socialnetwork.domain.user.UserEmail;
 import com.example.socialnetwork.domain.user.UserId;
 import com.example.socialnetwork.domain.user.exceptions.UserAlreadyExistsException;
 import com.example.socialnetwork.domain.user.ports.UserRepository;
+import com.example.socialnetwork.infrastructure.persistence.user.UserEntity;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -34,8 +35,27 @@ public class UserRegistrationServiceTest {
         }
 
         @Override
+        public void saveEntity(UserEntity entity) {
+            // Convertimos UserEntity → User de dominio
+            User domainUser = User.restore(
+                    UserId.of(entity.getId()),
+                    UserEmail.of(entity.getEmail()),
+                    entity.getDisplayName(),
+                    entity.getCreatedAt()
+            );
+
+            store.put(entity.getId().toString(), domainUser);
+        }
+
+
+        @Override
         public boolean existsByEmail(UserEmail email) {
             return findByEmail(email).isPresent();
+        }
+
+        @Override
+        public void deleteAll() {
+            store.clear();
         }
     }
 

@@ -2,7 +2,7 @@ package com.example.socialnetwork.infrastructure.persistence.interactions.follow
 
 import com.example.socialnetwork.domain.interactions.follow.Follow;
 import com.example.socialnetwork.domain.interactions.follow.FollowId;
-import com.example.socialnetwork.domain.post.AuthorId;
+import com.example.socialnetwork.domain.user.UserId;
 import com.example.socialnetwork.infrastructure.persistence.interactions.follow.adapters.FollowRepositoryJpaAdapter;
 import com.example.socialnetwork.infrastructure.persistence.interactions.follow.jpa.JpaFollowRepository;
 import com.example.socialnetwork.infrastructure.persistence.user.UserEntity;
@@ -59,8 +59,8 @@ class FollowRepositoryJpaAdapterTest extends PostgresTestContainer {
 
         Follow follow = Follow.create(
                 id,
-                AuthorId.of(followerIdValue),
-                AuthorId.of(followedIdValue)
+                UserId.of(followerIdValue),
+                UserId.of(followedIdValue)
         );
 
         repository.save(follow);
@@ -75,8 +75,8 @@ class FollowRepositoryJpaAdapterTest extends PostgresTestContainer {
     void saving_follow_with_nonexistent_user_should_fail() {
         Follow follow = Follow.create(
                 FollowId.generate(),
-                AuthorId.of(UUID.randomUUID()),
-                AuthorId.of(UUID.randomUUID())
+                UserId.of(UUID.randomUUID()),
+                UserId.of(UUID.randomUUID())
         );
 
         assertThatThrownBy(() -> repository.save(follow))

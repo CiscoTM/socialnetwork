@@ -3,7 +3,7 @@ package com.example.socialnetwork.infrastructure.persistence.interactions.follow
 import com.example.socialnetwork.domain.interactions.follow.Follow;
 import com.example.socialnetwork.domain.interactions.follow.FollowId;
 import com.example.socialnetwork.domain.interactions.follow.ports.FollowRepository;
-import com.example.socialnetwork.domain.post.AuthorId;
+import com.example.socialnetwork.domain.user.UserId;
 import com.example.socialnetwork.infrastructure.persistence.interactions.follow.FollowEntity;
 import com.example.socialnetwork.infrastructure.persistence.interactions.follow.jpa.JpaFollowRepository;
 import org.springframework.stereotype.Component;
@@ -30,14 +30,13 @@ public class FollowRepositoryJpaAdapter implements FollowRepository {
     }
 
     @Override
-    public Optional<Follow> findByFollowerAndFollowed(AuthorId followerId, AuthorId followedId) {
+    public Optional<Follow> findByFollowerAndFollowed(UserId followerId, UserId followedId) {
         return repository.findByFollowerAndFollowed(followerId.value(), followedId.value())
                 .map(entity -> new Follow(
                         FollowId.of(entity.getId()),
-                        AuthorId.of(entity.getFollower()),
-                        AuthorId.of(entity.getFollowed()),
+                        UserId.of(entity.getFollower()),
+                        UserId.of(entity.getFollowed()),
                         entity.getCreatedAt()
                 ));
     }
 }
-

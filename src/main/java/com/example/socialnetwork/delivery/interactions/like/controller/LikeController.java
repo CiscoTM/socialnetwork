@@ -7,6 +7,7 @@ import com.example.socialnetwork.delivery.interactions.like.dtos.LikeResponse;
 import com.example.socialnetwork.domain.interactions.like.Like;
 import com.example.socialnetwork.domain.post.AuthorId;
 import com.example.socialnetwork.domain.post.PostId;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,8 +27,7 @@ public class LikeController {
     }
 
     @PostMapping
-    public ResponseEntity<LikeResponse>like(@RequestBody LikeRequest request){
-        Like like = service.execute(
+    public ResponseEntity<LikeResponse> like(@Valid @RequestBody LikeRequest request) {        Like like = service.execute(
                 AuthorId.of(request.authorId()),
                 PostId.of(request.postId())
         );

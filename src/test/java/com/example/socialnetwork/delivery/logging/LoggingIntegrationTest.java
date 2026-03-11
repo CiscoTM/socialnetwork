@@ -57,16 +57,17 @@ class LoggingIntegrationTest extends IntegrationTestBase {
     void shouldLikeWithStructuredLogging() throws Exception {
 
         String json = """
-                {
-                  "authorId": "c8692eaf-6d42-4013-8ebc-36ee5d39a3fa",
-                  "postId": "8fac050a-ec8d-49d3-ba29-39f5b0f32cb4"
-                }
-                """;
+            {
+              "authorId": "c8692eaf-6d42-4013-8ebc-36ee5d39a3fa",
+              "postId": "8fac050a-ec8d-49d3-ba29-39f5b0f32cb4"
+            }
+            """;
 
         mockMvc.perform(
                 post("/api/likes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
-        ).andExpect(status().isInternalServerError());
+        ).andExpect(status().isConflict());
     }
+
 }

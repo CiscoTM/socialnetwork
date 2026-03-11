@@ -11,7 +11,6 @@ public class TestJwtTokenProvider {
     @Bean
     @Primary
     public JwtTokenProvider jwtTokenProvider() {
-        // Secreto fijo para tests (determinista)
         String secret = "test-secret-test-secret-test-secret-test-secret";
         return new JwtTokenProvider(secret);
     }
